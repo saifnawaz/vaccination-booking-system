@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Hospital;
 use App\Models\User;
 
 test('profile page is displayed', function () {
@@ -50,8 +51,8 @@ test('email verification status is unchanged when the email address is unchanged
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 
-test('user can delete their account', function () {
-    $user = User::factory()->create();
+test('parent can delete their account', function () {
+    $user = User::factory()->parent()->create();
 
     $response = $this
         ->actingAs($user)
@@ -64,8 +65,22 @@ test('user can delete their account', function () {
         ->assertRedirect('/');
 
     $this->assertGuest();
-    $this->assertNull($user->fresh());
+    // Users are soft-deleted, so their history stays intact.
+    $this->assertSoftDeleted($user);
+    expect(User::find($user->id))->toBeNull();
 });
+
+test('hospital and admin accounts cannot delete themselves', function (string $role) {
+    $user = $role === 'admin'
+        ? User::factory()->admin()->create()
+        : Hospital::factory()->active()->create()->user;
+
+    $this->actingAs($user)
+        ->delete('/profile', ['password' => 'password'])
+        ->assertForbidden();
+
+    $this->assertNotSoftDeleted($user);
+})->with(['admin', 'hospital']);
 
 test('correct password must be provided to delete account', function () {
     $user = User::factory()->create();
