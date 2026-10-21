@@ -1,0 +1,15 @@
+
+.slow-dropdown {
+    transition: all 0.4s ease-in-out !important;
+    transform: translateY(-10px);
+    opacity: 0;
+    display: block;
+    visibility: hidden;
+}
+
+.dropdown:hover .slow-dropdown,
+.dropdown.show .slow-dropdown {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}

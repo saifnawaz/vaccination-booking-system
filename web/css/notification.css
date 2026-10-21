@@ -1,0 +1,27 @@
+
+    .dropdown-menu {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .dropdown-item.active, 
+    .dropdown-item:active {
+        background-color: #13C5DD;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+    
+    .dropdown-header {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    .dropdown-item small {
+        color: #6c757d;
+    }

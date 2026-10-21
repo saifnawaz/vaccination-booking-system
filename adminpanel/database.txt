@@ -1,0 +1,100 @@
+CREATE DATABASE vaccination_system;
+USE vaccination_system;
+
+-- Users table for all types of users (admin, parents, hospital staff)
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    role ENUM('admin', 'parent', 'hospital') NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('active', 'inactive') DEFAULT 'active'
+);
+
+-- Children table
+CREATE TABLE children (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    parent_id INT,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
+    gender ENUM('male', 'female', 'other') NOT NULL,
+    blood_group VARCHAR(5),
+    medical_conditions TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Hospitals table
+CREATE TABLE hospitals (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    hospital_name VARCHAR(100) NOT NULL,
+    license_number VARCHAR(50),
+    address TEXT NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    operating_hours TEXT,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Vaccines table
+CREATE TABLE vaccines (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    recommended_age VARCHAR(50),
+    doses_required INT DEFAULT 1,
+    status ENUM('available', 'unavailable') DEFAULT 'available'
+);
+
+-- Hospital vaccine inventory
+CREATE TABLE hospital_vaccines (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    hospital_id INT,
+    vaccine_id INT,
+    quantity INT DEFAULT 0,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (hospital_id) REFERENCES hospitals(id),
+    FOREIGN KEY (vaccine_id) REFERENCES vaccines(id)
+);
+
+-- Appointments table
+CREATE TABLE appointments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    child_id INT,
+    hospital_id INT,
+    vaccine_id INT,
+    appointment_date DATE NOT NULL,
+    appointment_time TIME NOT NULL,
+    status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT 'pending',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (child_id) REFERENCES children(id),
+    FOREIGN KEY (hospital_id) REFERENCES hospitals(id),
+    FOREIGN KEY (vaccine_id) REFERENCES vaccines(id)
+);
+
+-- Vaccination records table
+CREATE TABLE vaccination_records (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    child_id INT,
+    vaccine_id INT,
+    hospital_id INT,
+    appointment_id INT,
+    vaccination_date DATE NOT NULL,
+    next_due_date DATE,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (child_id) REFERENCES children(id),
+    FOREIGN KEY (vaccine_id) REFERENCES vaccines(id),
+    FOREIGN KEY (hospital_id) REFERENCES hospitals(id),
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+);
+Last edited 1 day ag
