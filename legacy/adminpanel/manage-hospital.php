@@ -1,4 +1,3 @@
-<?php require_once 'auth.php'; require_role('admin'); ?>
 
 <?php
 include("connection.php");
@@ -79,11 +78,13 @@ include("connection.php");
             <?php 
             if(isset($_GET['Uid'])){
                 $up=$_GET['Uid'];
-                $query=mysqli_query($conn,"SELECT * FROM `vaccines` WHERE id=$up");
+                $query=mysqli_query($conn,"SELECT * FROM `hospitals` WHERE id=$up");
                 $col=mysqli_fetch_array($query);
             }
             ?>
-        <?php include("asside.php") ?>
+        <?php 
+        include("asside.php");
+         ?>
 
         <div class="container-fluid">
             <div class="main-content">
@@ -98,44 +99,34 @@ include("connection.php");
                         <div class="card-body">
                             <form action="" method="post" enctype="multipart/form-data">
                                 <div class="form-group">
-                                    <label for="vname" class="font-weight-bold">Vaccine Name</label>
-                                    <input type="text" name="vname" id="vname" value="<?php echo $col [1] ?>" class="form-control" placeholder="Enter vaccine name">
+                                    <label for="vname" class="font-weight-bold">Hospital_name</label>
+                                    <input type="text" name="hname" id="vname" value="<?php echo $col [2] ?>" class="form-control" placeholder="Enter vaccine name">
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="vdetail" class="font-weight-bold">Vaccine Details</label>
-                                    <input type="text" name="vdetail" id="vdes" value="<?php echo $col [2] ?>" class="form-control" placeholder="Enter vaccine description">
+                                    <label for="vdetail" class="font-weight-bold">Email</label>
+                                    <input type="email" name="hemail" id="vdes" value="<?php echo $col [5] ?>" class="form-control" placeholder="Enter vaccine description">
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="vqty" class="font-weight-bold">Vaccine Quantity</label>
-                                    <input type="text" name="vqty" id="vqty"value="<?php echo $col [3] ?>" class="form-control" placeholder="Enter quantity">
+                                    <label for="vqty" class="font-weight-bold">Address</label>
+                                    <input type="text" name="haddress" id="vqty"value="<?php echo $col [3] ?>" class="form-control" placeholder="Enter quantity">
                                 </div>
-
                                 <div class="form-group">
-                                    <label for="chosehos" class="font-weight-bold">Choose Hospital</label>
-                                    <select name="chosehos" id="chosehos"value="<?php echo $col [4] ?>" class="form-control">
-                                        <option value="<?php echo $col [5] ?>">Select Hospital</option>
-                                        <?php
-                                        $q = mysqli_query($conn, "SELECT * FROM `hospitals`");
-                                        while ($cat = mysqli_fetch_array($q)) {
-                                            echo "<option value='{$cat[0]}'>{$cat[2]}</option>";
-                                        }
-                                        ?>
-                                    </select>
+                                    <label for="vqty" class="font-weight-bold">Phone</label>
+                                    <input type="text" name="hphone" id="vqty"value="<?php echo $col [4] ?>" class="form-control" placeholder="Enter quantity">
                                 </div>
-
                                 <div class="form-group">
-                                    <label for="avl_unavl" class="font-weight-bold">Available / Unavailable</label>
-                                    <select name="avl_unavl" id="avl_unavl" class="form-control">
-                                        <option value="">Select Status</option>
-                                        <option value="Available">Available</option>
-                                        <option value="Unavailable">Unavailable</option>
+                                    <label for="avl_unavl" class="font-weight-bold">Active / Inactive</label>
+                                    <select name="act_inact" id="avl_unavl" class="form-control">
+                                        <option><?php echo $col [8] ?></option>
+                                        <option value="active">active</option>
+                                        <option value="inactive">inactive</option>
                                     </select>
                                 </div>
 
                                 <button type="submit" name="update" class="btn btn-primary btn-block">Update</button>
-                                <a href="view-hosvaccine.php" class="btn btn-info btn-block mt-2">View Vaccines</a>
+                                <a href="view_hosp.php" class="btn btn-info btn-block mt-2">View Hospitals</a>
                             </form>
                         </div>
                     </div>
@@ -151,17 +142,17 @@ include("connection.php");
 
 <?php
 if(isset($_POST['update'])){
-    $vname=$_POST['vname'];
-   $vdetail=$_POST['vdetail'];
-   $vqty=$_POST['vqty'];
-   $chosehos=$_POST['chosehos'];
-   $avl_unavl=$_POST['avl_unavl'];
-$q = mysqli_query($conn, "UPDATE `vaccines` SET `name`='$vname',`vaccines_detail`='$vdetail',`vaccines_qty`='$vqty',`hospital_id`='$chosehos',`status`='$avl_unavl' WHERE id=$up");
+    $hname=$_POST['hname'];
+   $hemail=$_POST['hemail'];
+   $haddress=$_POST['haddress'];
+   $hphone=$_POST['hphone'];
+   $act_inact=$_POST['act_inact'];
+$q = mysqli_query($conn, "UPDATE `hospitals` SET `hospital_name`='$hname',`address`='$haddress',`phone`='$hphone',`email`='$hemail',`status`='$act_inact' WHERE id=$up");
 
 
  if($q){
-   echo "<script>alert('Vaccine updated successfuly');
-   location.assign('view-hosvaccine.php');
+   echo "<script>alert('Hospitals updated successfuly');
+   location.assign('view_hosp.php');
    </script>";
  }
  else{
@@ -170,3 +161,4 @@ $q = mysqli_query($conn, "UPDATE `vaccines` SET `name`='$vname',`vaccines_detail
 }
 
 ?>
+

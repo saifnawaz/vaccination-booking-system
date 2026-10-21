@@ -1,4 +1,3 @@
-<?php require_once 'auth.php'; require_role('admin', 'hospital'); ?>
 <?php
 include("connection.php");
 ?>

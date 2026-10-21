@@ -1,6 +1,9 @@
-<?php require_once 'auth.php'; require_role('admin', 'hospital'); ?>
 <?php
+session_start();
 include("connection.php");
+if (isset($_SESSION['username']) == null) {
+    echo "<script>location.assign('login.php')</script>";
+} else {
 ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -754,3 +757,6 @@ include("connection.php");
                         </body>
 
     </html>
+<?php
+}
+?>
