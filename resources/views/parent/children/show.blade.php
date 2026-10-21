@@ -17,6 +17,9 @@
             <x-button :href="route('parent.children.edit', $child)" variant="secondary">
                 <x-heroicon-o-pencil-square class="size-4" aria-hidden="true" /> Edit details
             </x-button>
+            <x-button :href="route('parent.book.doses', $child)">
+                <x-heroicon-o-plus class="size-4" aria-hidden="true" /> Book vaccines
+            </x-button>
         </x-slot:actions>
     </x-page-header>
 
@@ -43,7 +46,7 @@
             <x-alert :type="$counts['overdue'] > 0 ? 'error' : 'warning'" class="mt-4">
                 {{ $child->first_name }} has {{ $counts['overdue'] + $counts['due'] }}
                 {{ str('dose')->plural($counts['overdue'] + $counts['due']) }} to get now.
-                Booking appointments will be available soon.
+                <a href="{{ route('parent.book.doses', $child) }}" class="font-semibold underline">Book an appointment</a>
             </x-alert>
         @endif
     </x-card>

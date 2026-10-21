@@ -29,6 +29,10 @@
                 @else
                     The hospital will be signed out, won't be able to log in, and will stop appearing to parents.
                     You can reactivate it at any time.
+                    @php($open = $hospital->appointments()->open()->count())
+                    @if ($open > 0)
+                        <strong class="mt-2 block text-ink">{{ $open }} open {{ str('appointment')->plural($open) }} will stay booked but can't be handled while it is inactive.</strong>
+                    @endif
                 @endif
                 <x-slot:fields>
                     <input type="hidden" name="status" value="{{ $next->value }}">

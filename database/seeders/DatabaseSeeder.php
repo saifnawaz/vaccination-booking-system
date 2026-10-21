@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             StockSeeder::class,
             TimeSlotSeeder::class,
             ChildSeeder::class,
+            AppointmentSeeder::class,
         ]);
     }
 }

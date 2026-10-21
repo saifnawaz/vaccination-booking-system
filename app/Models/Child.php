@@ -48,6 +48,14 @@ class Child extends Model
         return $this->hasMany(ChildDose::class);
     }
 
+    /**
+     * @return HasMany<Appointment, $this>
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
     public function fullName(): string
     {
         return "{$this->first_name} {$this->last_name}";
@@ -77,7 +85,7 @@ class Child extends Model
      */
     public function schedule(?CarbonImmutable $today = null): VaccinationSchedule
     {
-        $this->loadMissing('doses.scheduleDose.vaccine', 'doses.hospitalStock.hospital');
+        $this->loadMissing('doses.scheduleDose.vaccine', 'doses.administeredBy');
 
         return new VaccinationSchedule($this, $today ?? CarbonImmutable::today());
     }

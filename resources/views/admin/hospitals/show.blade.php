@@ -56,6 +56,25 @@
                 <p class="mt-3 text-ink">{{ $hospital->user->name }}</p>
                 <p class="text-sm text-ink-muted">{{ $hospital->user->email }}</p>
             </x-card>
+
+            <x-card>
+                <h2 class="text-base font-semibold text-ink">Delete hospital</h2>
+                @if ($openAppointments > 0)
+                    <p class="mt-2 text-sm text-ink-muted">
+                        {{ $openAppointments }} open {{ str('appointment')->plural($openAppointments) }} must be completed, declined or cancelled first.
+                        To stop new bookings now, deactivate the hospital instead.
+                    </p>
+                @else
+                    <p class="mt-2 text-sm text-ink-muted">The hospital and its login are removed. Its stock and appointment history are kept for records.</p>
+                    <x-button type="button" variant="danger" class="mt-4" x-data x-on:click="$dispatch('open-modal', 'delete-hospital')">
+                        Delete {{ $hospital->name }}
+                    </x-button>
+                    <x-confirm-dialog name="delete-hospital" :title="'Delete '.$hospital->name.'?'"
+                                      :action="route('admin.hospitals.destroy', $hospital)" method="DELETE" confirm-label="Delete hospital">
+                        It will no longer be able to log in or appear to parents. This can't be undone from the admin panel.
+                    </x-confirm-dialog>
+                @endif
+            </x-card>
         </div>
     </div>
 </x-app-layout>

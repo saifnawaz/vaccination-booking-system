@@ -32,6 +32,26 @@ final readonly class ScheduledDose
         return $this->dose->scheduleDose;
     }
 
+    /**
+     * Can be booked for some date: due, overdue (catch-up) or upcoming with a known
+     * due date. Not when completed, missed, or still waiting for the previous dose.
+     */
+    public function isBookable(): bool
+    {
+        return in_array($this->status, [DoseStatus::Due, DoseStatus::Overdue, DoseStatus::Upcoming], true)
+            && $this->effectiveDueDate !== null;
+    }
+
+    /**
+     * Whether the dose may be given on $date: not before it is due, not after its age limit.
+     */
+    public function canBeGivenOn(CarbonImmutable $date): bool
+    {
+        return $this->isBookable()
+            && $date->gte($this->effectiveDueDate)
+            && ($this->lastDate === null || $date->lte($this->lastDate));
+    }
+
     public function label(): string
     {
         return $this->schedule()->label;
@@ -45,8 +65,11 @@ final readonly class ScheduledDose
         $date = fn (CarbonImmutable $d) => $d->format('j M Y');
 
         return match ($this->status) {
-            DoseStatus::Completed => 'Given '.$date($this->dose->administered_at)
-                .($this->dose->hospitalStock ? ' at '.$this->dose->hospitalStock->hospital->name : ''),
+            DoseStatus::Completed => $this->dose->isHistoricalRecord()
+                ? 'Given '.$date($this->dose->administered_at).' · recorded from previous records'
+                    .($this->dose->administeredBy ? ' by '.$this->dose->administeredBy->name : '')
+                : 'Given '.$date($this->dose->administered_at)
+                    .($this->dose->administeredBy ? ' at '.$this->dose->administeredBy->name : ''),
             DoseStatus::Missed => $this->missedReason === 'series'
                 ? 'Can no longer be given because an earlier dose was missed'
                 : 'Could be given until '.$date($this->lastDate),

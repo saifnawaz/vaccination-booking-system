@@ -64,6 +64,14 @@ class HospitalStock extends Model
         return $this->hasMany(ChildDose::class);
     }
 
+    /**
+     * @return HasMany<Appointment, $this>
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
     public function available(): int
     {
         return max(0, $this->quantity - $this->reserved);
@@ -97,6 +105,8 @@ class HospitalStock extends Model
      */
     public function isRemovable(): bool
     {
-        return $this->reserved === 0 && ! $this->administeredDoses()->exists();
+        return $this->reserved === 0
+            && ! $this->administeredDoses()->exists()
+            && ! $this->appointments()->exists();
     }
 }

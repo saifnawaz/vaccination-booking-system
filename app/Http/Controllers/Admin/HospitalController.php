@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hospital;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -51,7 +52,32 @@ class HospitalController extends Controller
 
         $hospital->load('user', 'approver');
 
-        return view('admin.hospitals.show', ['hospital' => $hospital]);
+        return view('admin.hospitals.show', [
+            'hospital' => $hospital,
+            'openAppointments' => $hospital->appointments()->open()->count(),
+        ]);
+    }
+
+    /**
+     * Soft delete. Refused while parents have open appointments there.
+     */
+    public function destroy(Hospital $hospital): RedirectResponse
+    {
+        Gate::authorize('delete', $hospital);
+
+        $open = $hospital->appointments()->open()->count();
+
+        if ($open > 0) {
+            return back()->with('error', "{$hospital->name} has {$open} open ".str('appointment')->plural($open)
+                .'. Those must be completed, declined or cancelled before the hospital can be deleted.');
+        }
+
+        DB::transaction(function () use ($hospital) {
+            $hospital->delete();
+            $hospital->user->delete();
+        });
+
+        return redirect()->route('admin.hospitals.index')->with('success', "{$hospital->name} has been deleted.");
     }
 
     public function updateStatus(Request $request, Hospital $hospital): RedirectResponse

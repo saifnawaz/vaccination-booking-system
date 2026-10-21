@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AppointmentStatus;
 use Carbon\CarbonImmutable;
 use Database\Factories\TimeSlotFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // hospital_id is set from the signed-in hospital, never from request input.
 #[Fillable(['date', 'start_time', 'end_time', 'capacity'])]
@@ -22,6 +24,7 @@ class TimeSlot extends Model
         return [
             'date' => 'immutable_date',
             'capacity' => 'integer',
+            'booked_children' => 'integer', // from scopeWithBookedChildren()
         ];
     }
 
@@ -31,6 +34,70 @@ class TimeSlot extends Model
     public function hospital(): BelongsTo
     {
         return $this->belongsTo(Hospital::class);
+    }
+
+    /**
+     * @return HasMany<Appointment, $this>
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
+     * Adds `booked_children`: distinct children with an open appointment in the slot.
+     * Capacity counts children, so one child having several vaccines takes one place.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeWithBookedChildren(Builder $query): void
+    {
+        $query->addSelect(['booked_children' => Appointment::query()
+            ->selectRaw('count(distinct child_id)')
+            ->whereColumn('time_slot_id', 'time_slots.id')
+            ->whereIn('status', AppointmentStatus::OPEN),
+        ]);
+    }
+
+    /**
+     * Slots with at least one free place.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeWithFreePlaces(Builder $query): void
+    {
+        $query->whereRaw('time_slots.capacity > ('.Appointment::query()
+            ->selectRaw('count(distinct child_id)')
+            ->whereColumn('time_slot_id', 'time_slots.id')
+            ->whereIn('status', AppointmentStatus::OPEN)
+            ->toRawSql().')');
+    }
+
+    /**
+     * Slots that haven't started yet.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeNotStarted(Builder $query): void
+    {
+        $now = CarbonImmutable::now();
+
+        $query->where(fn (Builder $q) => $q
+            ->whereDate('date', '>', $now->toDateString())
+            ->orWhere(fn (Builder $q) => $q->whereDate('date', $now->toDateString())->where('start_time', '>', $now->format('H:i:s'))));
+    }
+
+    /**
+     * Distinct children holding a place, read fresh from the database.
+     */
+    public function bookedChildren(): int
+    {
+        return $this->appointments()->open()->distinct()->count('child_id');
+    }
+
+    public function hasStarted(?CarbonImmutable $now = null): bool
+    {
+        return $this->startsAt()->lte($now ?? CarbonImmutable::now());
     }
 
     /**

@@ -28,6 +28,8 @@ class TimeSlotController extends Controller
         $from = $filters['from'] ?? today()->toDateString();
 
         $slots = $request->user()->hospital->timeSlots()
+            ->select('time_slots.*')
+            ->withBookedChildren()
             ->whereDate('date', '>=', $from)
             ->when($filters['to'] ?? null, fn ($query, $to) => $query->whereDate('date', '<=', $to))
             ->orderBy('date')
@@ -121,8 +123,14 @@ class TimeSlotController extends Controller
             return redirect()->route('hospital.slots.index')->with('error', 'Past slots cannot be changed.');
         }
 
+        $booked = $slot->bookedChildren();
+
         $validated = $request->validate([
-            'capacity' => ['required', 'integer', 'min:1', 'max:'.config('vaccination.slots.max_capacity')],
+            'capacity' => ['required', 'integer', 'min:'.max(1, $booked), 'max:'.config('vaccination.slots.max_capacity')],
+        ], [
+            'capacity.min' => $booked > 0
+                ? "{$booked} ".str('child')->plural($booked).' already booked, so the capacity can\'t be lower than that.'
+                : 'The capacity must be at least 1.',
         ]);
 
         $slot->update($validated);
@@ -137,6 +145,12 @@ class TimeSlotController extends Controller
 
         if ($slot->date->isBefore(today())) {
             return back()->with('error', 'Past slots cannot be removed.');
+        }
+
+        if ($slot->appointments()->exists()) {
+            return back()->with('error', $slot->appointments()->open()->exists()
+                ? 'Parents have booked this slot. Decline their appointments first if you need to close it.'
+                : 'This slot has appointment history, so it can\'t be removed.');
         }
 
         $slot->delete();

@@ -1,6 +1,14 @@
 <x-app-layout title="Overview">
     <x-page-header :title="$hospital->name" description="Your stock and opening times at a glance." />
 
+    <div class="mb-4 grid gap-4 sm:grid-cols-2">
+        <x-stat label="Bookings to confirm" :value="$pendingCount" icon="heroicon-o-clipboard-document-check"
+                :tone="$pendingCount > 0 ? 'accent' : 'neutral'"
+                :href="route('hospital.appointments.index', ['status' => 'pending'])" />
+        <x-stat label="Appointments today" :value="$today->count()" icon="heroicon-o-calendar-days"
+                :href="route('hospital.appointments.index', ['date' => today()->toDateString()])" />
+    </div>
+
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <x-stat label="Usable doses in stock" :value="$stock->usableDoses()" icon="heroicon-o-archive-box"
                 :href="route('hospital.stock.index')" />
@@ -15,7 +23,34 @@
 
     <div class="mt-8 grid gap-6 lg:grid-cols-3">
         <div class="space-y-4 lg:col-span-2">
+            @if ($today->isNotEmpty())
+                <h2 class="text-lg font-semibold text-ink">Today</h2>
+                <x-card :padding="false" class="overflow-hidden">
+                    <ul class="divide-y divide-line">
+                        @foreach ($today as $appointment)
+                            <li>
+                                <a href="{{ route('hospital.appointments.show', $appointment) }}" class="flex items-center justify-between gap-3 px-5 py-3 hover:bg-canvas">
+                                    <span>
+                                        <span class="font-semibold text-ink">{{ \App\Models\TimeSlot::formatTime($appointment->timeSlot->start_time) }}</span>
+                                        <span class="text-ink"> · {{ $appointment->child->fullName() }}</span>
+                                        <span class="block text-sm text-ink-muted">{{ $appointment->doseLabel() }}</span>
+                                    </span>
+                                    <x-badge :tone="$appointment->status->tone()">{{ $appointment->status->label() }}</x-badge>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </x-card>
+            @endif
+
             <h2 class="text-lg font-semibold text-ink">Needs attention</h2>
+
+            @if ($pendingCount > 0)
+                <x-alert type="warning" title="{{ $pendingCount }} {{ str('booking')->plural($pendingCount) }} waiting for confirmation">
+                    Parents are waiting to hear back.
+                    <a href="{{ route('hospital.appointments.index', ['status' => 'pending']) }}" class="font-semibold underline">Review bookings</a>
+                </x-alert>
+            @endif
 
             @php($attention = false)
 
@@ -52,7 +87,7 @@
                 </x-empty-state>
             @endif
 
-            @unless ($attention)
+            @unless ($attention || $pendingCount > 0)
                 <x-alert type="success">Everything looks good: stock is healthy and you have open slots.</x-alert>
             @endunless
         </div>

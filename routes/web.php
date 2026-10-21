@@ -23,6 +23,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/hospitals', [Admin\HospitalController::class, 'index'])->name('hospitals.index');
     Route::get('/hospitals/{hospital}', [Admin\HospitalController::class, 'show'])->name('hospitals.show');
     Route::patch('/hospitals/{hospital}/status', [Admin\HospitalController::class, 'updateStatus'])->name('hospitals.status');
+    Route::delete('/hospitals/{hospital}', [Admin\HospitalController::class, 'destroy'])->name('hospitals.destroy');
 
     Route::get('/admins', [Admin\AdminUserController::class, 'index'])->name('admins.index');
     Route::get('/admins/create', [Admin\AdminUserController::class, 'create'])->name('admins.create');
@@ -45,12 +46,33 @@ Route::middleware(['auth', 'role:hospital'])->prefix('hospital')->name('hospital
     Route::get('/slots/bulk', [Hospital\TimeSlotController::class, 'bulkCreate'])->name('slots.bulk');
     Route::post('/slots/bulk', [Hospital\TimeSlotController::class, 'bulkStore'])->name('slots.bulk.store');
     Route::resource('slots', Hospital\TimeSlotController::class)->except('show');
+
+    Route::get('/appointments', [Hospital\AppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('/appointments/{appointment}', [Hospital\AppointmentController::class, 'show'])->name('appointments.show');
+    Route::patch('/appointments/{appointment}/approve', [Hospital\AppointmentController::class, 'approve'])->name('appointments.approve');
+    Route::patch('/appointments/{appointment}/reject', [Hospital\AppointmentController::class, 'reject'])->name('appointments.reject');
+    Route::patch('/appointments/{appointment}/complete', [Hospital\AppointmentController::class, 'complete'])->name('appointments.complete');
+    Route::patch('/appointments/{appointment}/no-show', [Hospital\AppointmentController::class, 'noShow'])->name('appointments.no-show');
+    Route::post('/appointments/{appointment}/history', [Hospital\AppointmentController::class, 'recordHistory'])->name('appointments.history');
 });
 
 Route::middleware(['auth', 'role:parent'])->prefix('parent')->name('parent.')->group(function () {
     Route::get('/', ParentPortal\DashboardController::class)->name('dashboard');
 
     Route::resource('children', ParentPortal\ChildController::class);
+
+    // Booking: child → doses → hospital → slot → confirm.
+    Route::get('/book', [ParentPortal\BookingController::class, 'children'])->name('book');
+    Route::get('/book/{child}', [ParentPortal\BookingController::class, 'doses'])->name('book.doses');
+    Route::get('/book/{child}/hospitals', [ParentPortal\BookingController::class, 'hospitals'])->name('book.hospitals');
+    Route::get('/book/{child}/hospitals/{hospital}', [ParentPortal\BookingController::class, 'slots'])->name('book.slots');
+    Route::get('/book/{child}/confirm', [ParentPortal\BookingController::class, 'confirm'])->name('book.confirm');
+
+    Route::get('/appointments', [ParentPortal\AppointmentController::class, 'index'])->name('appointments.index');
+    Route::post('/appointments', [ParentPortal\AppointmentController::class, 'store'])->name('appointments.store');
+    Route::patch('/appointments/{appointment}/cancel', [ParentPortal\AppointmentController::class, 'cancel'])->name('appointments.cancel');
+    Route::get('/appointments/{appointment}/reschedule', [ParentPortal\AppointmentController::class, 'editSchedule'])->name('appointments.reschedule');
+    Route::patch('/appointments/{appointment}/reschedule', [ParentPortal\AppointmentController::class, 'reschedule'])->name('appointments.reschedule.update');
 });
 
 require __DIR__.'/auth.php';

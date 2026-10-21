@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Hospital;
 
+use App\Enums\AppointmentStatus;
 use App\Http\Controllers\Controller;
 use App\Services\StockSummary;
 use Illuminate\Http\Request;
@@ -20,6 +21,12 @@ class DashboardController extends Controller
             'stock' => new StockSummary($hospital),
             'upcomingSlotCount' => (clone $upcomingSlots)->count(),
             'nextSlotDate' => (clone $upcomingSlots)->min('date'),
+            'pendingCount' => $hospital->appointments()->where('status', AppointmentStatus::Pending)->count(),
+            'today' => $hospital->appointments()->open()
+                ->whereHas('timeSlot', fn ($q) => $q->whereDate('date', today()))
+                ->with('child', 'timeSlot', 'childDose.scheduleDose')
+                ->get()
+                ->sortBy(fn ($a) => $a->timeSlot->start_time),
         ]);
     }
 }

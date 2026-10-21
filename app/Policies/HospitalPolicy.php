@@ -33,6 +33,14 @@ class HospitalPolicy
         return $user->isAdmin();
     }
 
+    /**
+     * Soft delete (refused while appointments are open; see Admin\HospitalController).
+     */
+    public function delete(User $user, Hospital $hospital): bool
+    {
+        return $user->isAdmin();
+    }
+
     private function owns(User $user, Hospital $hospital): bool
     {
         return $user->isHospital() && $hospital->user_id === $user->id;
