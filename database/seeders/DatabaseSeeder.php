@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Services\DoseReminders;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,5 +21,9 @@ class DatabaseSeeder extends Seeder
             ChildSeeder::class,
             AppointmentSeeder::class,
         ]);
+
+        // Give the demo parents their due/overdue reminders straight away,
+        // as the daily reminders:send job would.
+        app(DoseReminders::class)->send();
     }
 }

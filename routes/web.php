@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Hospital;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ParentPortal;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('/notifications/{id}', [NotificationController::class, 'open'])->name('notifications.open');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -28,6 +34,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/admins', [Admin\AdminUserController::class, 'index'])->name('admins.index');
     Route::get('/admins/create', [Admin\AdminUserController::class, 'create'])->name('admins.create');
     Route::post('/admins', [Admin\AdminUserController::class, 'store'])->name('admins.store');
+
+    Route::get('/activity', [Admin\ActivityLogController::class, 'index'])->name('activity.index');
 
     Route::get('/vaccines/schedule', [Admin\VaccineController::class, 'schedule'])->name('vaccines.schedule');
     Route::resource('vaccines', Admin\VaccineController::class)->except('show');
@@ -59,6 +67,8 @@ Route::middleware(['auth', 'role:hospital'])->prefix('hospital')->name('hospital
 Route::middleware(['auth', 'role:parent'])->prefix('parent')->name('parent.')->group(function () {
     Route::get('/', ParentPortal\DashboardController::class)->name('dashboard');
 
+    Route::get('/children/{child}/certificate', [ParentPortal\ChildController::class, 'certificate'])->name('children.certificate');
+    Route::get('/children/{child}/certificate.pdf', [ParentPortal\ChildController::class, 'certificatePdf'])->name('children.certificate.pdf');
     Route::resource('children', ParentPortal\ChildController::class);
 
     // Booking: child → doses → hospital → slot → confirm.

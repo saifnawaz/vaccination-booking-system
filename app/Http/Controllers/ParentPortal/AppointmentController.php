@@ -31,7 +31,14 @@ class AppointmentController extends Controller
             ->orderBy('time_slots.date')->orderBy('time_slots.start_time')
             ->get();
 
+        $filters = $request->validate([
+            'child' => ['nullable', 'integer'],
+            'status' => ['nullable', 'in:completed,cancelled,rejected,no_show'],
+        ]);
+
         $past = (clone $base)->whereNotIn('appointments.status', AppointmentStatus::OPEN)
+            ->when($filters['child'] ?? null, fn ($q, $id) => $q->where('appointments.child_id', $id))
+            ->when($filters['status'] ?? null, fn ($q, $status) => $q->where('appointments.status', $status))
             ->orderByDesc('time_slots.date')->orderByDesc('time_slots.start_time')
             ->paginate(15)
             ->withQueryString();
@@ -40,6 +47,8 @@ class AppointmentController extends Controller
             // A visit = one child in one slot; it may cover several vaccines.
             'visits' => $upcoming->groupBy(fn (Appointment $a) => $a->child_id.'-'.$a->time_slot_id),
             'past' => $past,
+            'filters' => $filters,
+            'children' => $request->user()->children()->orderBy('first_name')->get(['id', 'first_name', 'last_name']),
         ]);
     }
 

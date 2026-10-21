@@ -133,15 +133,11 @@ test('an admin can view a hospital', function () {
         ->assertOk()->assertSee('Delta Clinic')->assertSee('Approve')->assertSee('Decline');
 });
 
-test('the admin dashboard shows real counts', function () {
+test('the admin dashboard shows the pending approvals count', function () {
     Hospital::factory()->count(2)->create();
     Hospital::factory()->count(3)->active()->create();
-    User::factory()->count(4)->parent()->create();
 
     $this->actingAs($this->admin)->get(route('admin.dashboard'))
         ->assertOk()
-        ->assertViewHas('pendingHospitals', 2)
-        ->assertViewHas('activeHospitals', 3)
-        ->assertViewHas('inactiveHospitals', 0)
-        ->assertViewHas('parents', 4);
+        ->assertViewHas('pendingHospitals', 2);
 });

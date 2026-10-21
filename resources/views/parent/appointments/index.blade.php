@@ -69,8 +69,39 @@
     <section aria-labelledby="past-heading" class="mt-10">
         <h2 id="past-heading" class="mb-3 text-lg font-semibold text-ink">History</h2>
 
+        <form method="GET" action="{{ route('parent.appointments.index') }}" data-no-loading class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+            @if ($children->count() > 1)
+                <div class="sm:w-52">
+                    <x-input-label for="child" value="Child" />
+                    <select id="child" name="child" class="mt-1.5 block w-full rounded-lg border-line-input bg-surface text-ink shadow-xs focus:border-primary-600 focus:ring-primary-600">
+                        <option value="">All children</option>
+                        @foreach ($children as $c)
+                            <option value="{{ $c->id }}" @selected((int) ($filters['child'] ?? 0) === $c->id)>{{ $c->first_name }} {{ $c->last_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
+            <div class="sm:w-52">
+                <x-input-label for="history-status" value="Status" />
+                <select id="history-status" name="status" class="mt-1.5 block w-full rounded-lg border-line-input bg-surface text-ink shadow-xs focus:border-primary-600 focus:ring-primary-600">
+                    <option value="">Any</option>
+                    @foreach (['completed', 'cancelled', 'rejected', 'no_show'] as $s)
+                        <option value="{{ $s }}" @selected(($filters['status'] ?? null) === $s)>{{ \App\Enums\AppointmentStatus::from($s)->label() }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <x-button variant="secondary">Filter</x-button>
+                @if (array_filter($filters))
+                    <x-button :href="route('parent.appointments.index')" variant="ghost">Clear</x-button>
+                @endif
+            </div>
+        </form>
+
         @if ($past->isEmpty())
-            <p class="text-sm text-ink-muted">Past, cancelled and declined appointments will appear here.</p>
+            <p class="text-sm text-ink-muted">
+                {{ array_filter($filters) ? 'No past appointments match.' : 'Past, cancelled and declined appointments will appear here.' }}
+            </p>
         @else
             <x-card :padding="false" class="overflow-hidden">
                 <ul class="divide-y divide-line">

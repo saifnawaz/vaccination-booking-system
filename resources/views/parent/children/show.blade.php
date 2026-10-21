@@ -17,6 +17,9 @@
             <x-button :href="route('parent.children.edit', $child)" variant="secondary">
                 <x-heroicon-o-pencil-square class="size-4" aria-hidden="true" /> Edit details
             </x-button>
+            <x-button :href="route('parent.children.certificate', $child)" variant="secondary">
+                <x-heroicon-o-document-text class="size-4" aria-hidden="true" /> Certificate
+            </x-button>
             <x-button :href="route('parent.book.doses', $child)">
                 <x-heroicon-o-plus class="size-4" aria-hidden="true" /> Book vaccines
             </x-button>

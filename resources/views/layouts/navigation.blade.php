@@ -32,7 +32,9 @@
             </ul>
         </nav>
 
-        <div class="ms-auto flex items-center gap-2">
+        <div class="ms-auto flex items-center gap-1 sm:gap-2">
+            <x-notification-bell />
+
             {{-- Account menu (all screen sizes) --}}
             <x-dropdown align="right" width="56">
                 <x-slot name="trigger">

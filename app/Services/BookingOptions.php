@@ -122,8 +122,9 @@ final class BookingOptions
     }
 
     /**
-     * Free, not-yet-started slots at the hospital on which every chosen dose can be
-     * given and every vaccine is still in stock (a batch lasting until that date).
+     * Free slots at the hospital, starting at least the minimum notice from now, on which
+     * every chosen dose can be given and every vaccine is still in stock (a batch
+     * lasting until that date).
      *
      * @param  Collection<int, ScheduledDose>  $doses
      * @return Collection<int, TimeSlot>
@@ -170,7 +171,7 @@ final class BookingOptions
             ->where('hospital_id', $hospital->id)
             ->whereDate('date', '>=', $from->toDateString())
             ->whereDate('date', '<=', $to->toDateString())
-            ->notStarted()
+            ->startsAfter(CarbonImmutable::now()->addMinutes(config('vaccination.booking.min_notice_minutes')))
             ->withFreePlaces();
     }
 }

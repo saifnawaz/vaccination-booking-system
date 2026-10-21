@@ -5,12 +5,15 @@ namespace App\Http\Controllers\ParentPortal;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ChildRequest;
 use App\Models\Child;
+use App\Services\ActivityLogger;
 use App\Services\ScheduleGenerator;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class ChildController extends Controller
 {
@@ -20,12 +23,22 @@ class ChildController extends Controller
     {
         Gate::authorize('viewAny', Child::class);
 
-        $children = $request->user()->children()
-            ->with('doses.scheduleDose.vaccine', 'doses.hospitalStock.hospital')
-            ->orderBy('date_of_birth', 'desc')
-            ->get();
+        $search = $request->validate(['search' => ['nullable', 'string', 'max:100']])['search'] ?? null;
 
-        return view('parent.children.index', ['children' => $children]);
+        $children = $request->user()->children()
+            ->with('doses.scheduleDose.vaccine', 'doses.administeredBy')
+            ->when($search, fn ($q) => $q->where(fn ($q) => $q
+                ->where('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%")))
+            ->orderBy('date_of_birth', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('parent.children.index', [
+            'children' => $children,
+            'search' => $search,
+            'total' => $request->user()->children()->count(),
+        ]);
     }
 
     public function create(): View
@@ -63,6 +76,26 @@ class ChildController extends Controller
         ]);
     }
 
+    /**
+     * Print-friendly certificate.
+     */
+    public function certificate(Child $child): View
+    {
+        Gate::authorize('view', $child);
+
+        return view('certificates.child', ['child' => $child->load('parent'), 'schedule' => $child->schedule(), 'pdf' => false]);
+    }
+
+    public function certificatePdf(Child $child): Response
+    {
+        Gate::authorize('view', $child);
+
+        $pdf = Pdf::loadView('certificates.child', ['child' => $child->load('parent'), 'schedule' => $child->schedule(), 'pdf' => true])
+            ->setPaper('a4');
+
+        return $pdf->download(str("{$child->fullName()} vaccination certificate")->slug().'.pdf');
+    }
+
     public function edit(Child $child): View
     {
         Gate::authorize('update', $child);
@@ -93,6 +126,7 @@ class ChildController extends Controller
         Gate::authorize('delete', $child);
 
         $child->delete();
+        app(ActivityLogger::class)->log('child.removed', "Removed {$child->fullName()} from their account", $child);
 
         return redirect()->route('parent.children.index')
             ->with('success', "{$child->first_name} has been removed from your account.");

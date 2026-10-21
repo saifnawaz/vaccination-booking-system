@@ -31,7 +31,10 @@
                     You can reactivate it at any time.
                     @php($open = $hospital->appointments()->open()->count())
                     @if ($open > 0)
-                        <strong class="mt-2 block text-ink">{{ $open }} open {{ str('appointment')->plural($open) }} will stay booked but can't be handled while it is inactive.</strong>
+                        <strong class="mt-2 block text-ink">
+                            Its {{ $open }} open {{ str('appointment')->plural($open) }} will be cancelled, the doses returned to stock,
+                            and the parents notified.
+                        </strong>
                     @endif
                 @endif
                 <x-slot:fields>

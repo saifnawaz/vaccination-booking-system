@@ -12,6 +12,7 @@ use App\Models\Hospital;
 use App\Models\HospitalStock;
 use App\Models\TimeSlot;
 use App\Models\Vaccine;
+use App\Notifications\AppointmentUpdated;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
@@ -42,6 +43,12 @@ use LogicException;
 final class AppointmentService
 {
     private const ATTEMPTS = 3;
+
+    public const REASON_HOSPITAL_DEACTIVATED = 'hospital deactivated';
+
+    public const REASON_NOT_CONFIRMED = 'not confirmed before the appointment time';
+
+    public function __construct(private readonly ActivityLogger $activity) {}
 
     /**
      * Book one or more of a child's doses into one slot (one visit).
@@ -119,8 +126,66 @@ final class AppointmentService
             $appointment->cancelled_at = now();
             $appointment->save();
 
+            $this->log('appointment.cancelled', 'Cancelled', $appointment, $reason ? ['reason' => $reason] : []);
+
             return $appointment;
         }, self::ATTEMPTS);
+    }
+
+    /**
+     * Cancel without the parent's 24-hour rule: when a hospital is deactivated, or a
+     * booking was never confirmed. Releases the dose and tells the parent.
+     */
+    public function cancelBySystem(Appointment $appointment, string $reason): Appointment
+    {
+        return DB::transaction(function () use ($appointment, $reason) {
+            $appointment = $this->lockAppointment($appointment->id);
+            $this->transition($appointment, AppointmentStatus::Cancelled);
+
+            $this->releaseReservation($appointment);
+            $appointment->reason = $reason;
+            $appointment->cancelled_at = now();
+            $appointment->save();
+
+            $this->notifyParent($appointment, 'cancelled');
+            $this->log('appointment.auto_cancelled', "Cancelled automatically ({$reason})", $appointment, ['reason' => $reason], system: true);
+
+            return $appointment;
+        }, self::ATTEMPTS);
+    }
+
+    /**
+     * Cancel every open appointment at a hospital that is being deactivated.
+     *
+     * @return int how many were cancelled
+     */
+    public function cancelOpenForHospital(Hospital $hospital): int
+    {
+        return $hospital->appointments()->open()->orderBy('id')->get()
+            ->each(fn (Appointment $a) => $this->cancelBySystem($a, self::REASON_HOSPITAL_DEACTIVATED))
+            ->count();
+    }
+
+    /**
+     * Cancel pending bookings whose slot has already started without the hospital
+     * confirming them. Run hourly by the scheduler.
+     *
+     * @return int how many were cancelled
+     */
+    public function cancelUnconfirmedPastStart(): int
+    {
+        $now = CarbonImmutable::now();
+
+        return Appointment::query()
+            ->where('appointments.status', AppointmentStatus::Pending)
+            ->join('time_slots', 'time_slots.id', '=', 'appointments.time_slot_id')
+            ->where(fn ($q) => $q
+                ->whereDate('time_slots.date', '<', $now->toDateString())
+                ->orWhere(fn ($q) => $q->whereDate('time_slots.date', $now->toDateString())->where('time_slots.start_time', '<=', $now->format('H:i:s'))))
+            ->orderBy('appointments.id')
+            ->get(['appointments.*'])
+            ->each(fn (Appointment $a) => $this->cancelBySystem($a, self::REASON_NOT_CONFIRMED))
+            ->count();
     }
 
     /**
@@ -159,10 +224,14 @@ final class AppointmentService
                 $appointment->hospital_stock_id = $replacement->id;
             }
 
+            $from = $appointment->timeSlot;
             $appointment->time_slot_id = $slot->id;
             $appointment->status = AppointmentStatus::Pending;
             $appointment->approved_at = null;
             $appointment->save();
+
+            $this->log('appointment.rescheduled', 'Moved from '.$from->date->format('j M').' '.TimeSlot::formatTime($from->start_time)
+                .' to '.$slot->date->format('j M').' '.TimeSlot::formatTime($slot->start_time), $appointment);
 
             return $appointment;
         }, self::ATTEMPTS);
@@ -176,6 +245,9 @@ final class AppointmentService
 
             $appointment->approved_at = now();
             $appointment->save();
+
+            $this->notifyParent($appointment, 'approved');
+            $this->log('appointment.approved', 'Confirmed', $appointment);
 
             return $appointment;
         }, self::ATTEMPTS);
@@ -191,6 +263,9 @@ final class AppointmentService
             $appointment->reason = $reason;
             $appointment->rejected_at = now();
             $appointment->save();
+
+            $this->notifyParent($appointment, 'rejected');
+            $this->log('appointment.rejected', 'Declined', $appointment, ['reason' => $reason]);
 
             return $appointment;
         }, self::ATTEMPTS);
@@ -233,6 +308,8 @@ final class AppointmentService
             $appointment->completed_at = now();
             $appointment->save();
 
+            $this->log('appointment.completed', "Recorded as given from batch {$batch->batch_number}", $appointment);
+
             return $appointment;
         }, self::ATTEMPTS);
     }
@@ -253,6 +330,9 @@ final class AppointmentService
             $this->releaseReservation($appointment);
             $appointment->no_show_at = now();
             $appointment->save();
+
+            $this->notifyParent($appointment, 'no_show');
+            $this->log('appointment.no_show', 'Marked as missed (child did not come)', $appointment);
 
             return $appointment;
         }, self::ATTEMPTS);
@@ -314,6 +394,9 @@ final class AppointmentService
             $dose->source = DoseSource::HistoricalRecord;
             $dose->save();
 
+            $this->activity->log('dose.recorded', "Recorded {$schedule->label} for {$child->fullName()} from previous records (given ".$givenOn->format('j M Y').')', $dose,
+                array_filter(['batch_number' => $batchNumber]));
+
             return $dose;
         }, self::ATTEMPTS);
     }
@@ -344,6 +427,10 @@ final class AppointmentService
 
         if ($slot->hasStarted()) {
             throw new BookingException('That time has already passed. Please choose another.');
+        }
+
+        if ($slot->startsAt()->lt(CarbonImmutable::now()->addMinutes(config('vaccination.booking.min_notice_minutes')))) {
+            throw new BookingException('That time is too soon to book online. Please choose a later time or phone the hospital.');
         }
 
         // Locking reads: see bookings committed while we waited for the slot lock.
@@ -400,6 +487,30 @@ final class AppointmentService
         }
 
         $appointment->status = $next;
+    }
+
+    private function notifyParent(Appointment $appointment, string $event): void
+    {
+        $appointment->loadMissing('child.parent');
+        $appointment->child->parent?->notify(new AppointmentUpdated($appointment, $event));
+    }
+
+    /**
+     * Log an appointment event with its child, dose and hospital in the description.
+     *
+     * @param  array<string, mixed>  $properties
+     */
+    private function log(string $action, string $what, Appointment $appointment, array $properties = [], bool $system = false): void
+    {
+        $appointment->loadMissing('child', 'hospital', 'childDose.scheduleDose');
+
+        $this->activity->log(
+            $action,
+            "{$what}: {$appointment->doseLabel()} for {$appointment->child->fullName()} at {$appointment->hospital->name}",
+            $appointment,
+            $properties,
+            system: $system,
+        );
     }
 
     private function releaseReservation(Appointment $appointment): void
