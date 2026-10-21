@@ -1,3 +1,4 @@
+<?php require_once 'auth.php'; require_role('admin'); ?>
 <?php include('connection.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -138,8 +139,8 @@ footer {
     </div>
 
     <?php
-    if (isset($_GET['id'])) {
-        $id = $_GET['id'];
+    if (isset($_POST['delete_id'])) {
+        $id = $_POST['delete_id'];
         $del = mysqli_query($conn, "DELETE FROM `vaccines` WHERE id=$id");
         if ($del) {
             echo "<script>alert('Data deleted');

@@ -1,3 +1,4 @@
+<?php require_once 'auth.php'; require_role('hospital'); ?>
 <?php include('connection.php'); ?>
 <!DOCTYPE html>
 <html lang="en">

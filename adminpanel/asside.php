@@ -1,8 +1,7 @@
-<?php 
-session_start();
-if (isset($_SESSION['username']) && $_SESSION['userrole'] == 'admin') {  
-    // echo "<script>location.assign('login.php')</script>";
-?>  
+<?php
+// Session and login are handled by auth.php, which every page includes before this sidebar.
+if ($_SESSION['userrole'] == 'admin') {
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +75,7 @@ if (isset($_SESSION['username']) && $_SESSION['userrole'] == 'admin') {
 </div>
 
 <?php 
-} elseif (isset($_SESSION['username']) && $_SESSION['userrole'] == 'hospital') {
+} elseif ($_SESSION['userrole'] == 'hospital') {
 ?>
 
 <!-- Hospital Header -->
@@ -178,9 +177,7 @@ if (isset($_SESSION['username']) && $_SESSION['userrole'] == 'admin') {
     </div>
 </div>
 
-<?php 
-} else {
-    echo "<script>location.assign('login.php')</script>";
+<?php
 }
 ?>
 

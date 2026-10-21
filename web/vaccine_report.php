@@ -1,3 +1,4 @@
+<?php require_once 'auth.php'; ?>
 <?php include('connection.php'); ?>
 <!DOCTYPE html>
 <html lang="en">

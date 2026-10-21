@@ -1,3 +1,4 @@
+<?php require_once 'auth.php'; require_role('admin'); ?>
 <?php include('connection.php'); ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -175,9 +176,12 @@
                                     <a href="update_hosp.php?Uid=<?php echo $data['id']; ?>" class="btn btn-info btn-sm btn-action">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <a href="?id=<?php echo $data['id']; ?>" class="btn btn-primary btn-sm btn-action" onclick="return confirm('Are you sure you want to delete this item?');">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </a>
+                                    <form method="post" action="" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                        <input type="hidden" name="delete_id" value="<?php echo $data['id']; ?>">
+                                        <button type="submit" class="btn btn-primary btn-sm btn-action">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php } ?>
@@ -190,8 +194,8 @@
     <!-- Footer -->
    
     <?php
-    if (isset($_GET['id'])) {
-        $id = intval($_GET['id']); 
+    if (isset($_POST['delete_id'])) {
+        $id = intval($_POST['delete_id']); 
     
         $del_appointments = mysqli_query($conn, "DELETE FROM appointments WHERE vaccine_id IN (SELECT id FROM vaccines WHERE hospital_id = '$id')");
     

@@ -1,10 +1,7 @@
+<?php require_once 'auth.php'; ?>
 <?php
 
 include("header.php");
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== "parent") {
-    echo ("<script> location.assign('login.php')</script>");
-    exit;
-}
 ?>
 <style>
     .profile-picture {

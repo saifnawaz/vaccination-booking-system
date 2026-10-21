@@ -1,8 +1,6 @@
+<?php require_once 'auth.php'; ?>
 <?php
 include("header.php");
-if ($_SESSION['role'] !== "parent") {
-    echo ("<script> location.assign('login.php')</script>");
-} else {
 ?>
 
     <style>
@@ -151,5 +149,3 @@ if ($_SESSION['role'] !== "parent") {
     </body>
 
     </html>
-<?php
-} ?>
