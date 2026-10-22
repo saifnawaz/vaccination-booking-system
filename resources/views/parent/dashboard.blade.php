@@ -32,13 +32,13 @@
                 <ul class="space-y-3">
                     @foreach ($upcoming as $visit)
                         @php($first = $visit->first())
-                        <li class="rounded-2xl bg-surface p-4 shadow-sm ring-1 ring-line">
+                        <li class="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-line">
                             <p class="font-semibold text-ink">{{ $first->timeSlot->date->format('D j M') }}, {{ \App\Models\TimeSlot::formatTime($first->timeSlot->start_time) }}
                                 <span class="font-normal text-ink-muted">· {{ $first->child->first_name }}</span></p>
                             <p class="text-sm text-ink-muted">{{ $first->hospital->name }}</p>
                             <div class="mt-2 flex flex-wrap gap-2">
                                 @foreach ($visit as $appointment)
-                                    <x-badge :tone="$appointment->status->tone()">{{ $appointment->doseLabel() }}: {{ $appointment->status->label() }}</x-badge>
+                                    <x-badge :tone="$appointment->status->tone()" :icon="$appointment->status->icon()">{{ $appointment->doseLabel() }}: {{ $appointment->status->label() }}</x-badge>
                                 @endforeach
                             </div>
                         </li>

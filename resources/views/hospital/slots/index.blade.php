@@ -10,8 +10,8 @@
         </x-slot:actions>
     </x-page-header>
 
-    <form method="GET" action="{{ route('hospital.slots.index') }}" data-no-loading
-          class="mb-6 flex flex-col gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line sm:flex-row sm:items-end">
+    <form method="GET" action="{{ route('hospital.slots.index') }}" data-no-loading data-filter
+          class="mb-6 flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-line sm:flex-row sm:items-end">
         <div>
             <x-input-label for="from" value="From" />
             <x-text-input id="from" name="from" type="date" :value="$filters['from']" class="mt-1.5" />
@@ -26,6 +26,7 @@
         </div>
     </form>
 
+    <x-list-region>
     @if ($slots->isEmpty())
         <x-empty-state title="No slots in this period" icon="heroicon-o-calendar-days">
             Create your opening hours in one go, for example every weekday morning for the next month.
@@ -79,4 +80,5 @@
 
         <div class="mt-6">{{ $slots->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

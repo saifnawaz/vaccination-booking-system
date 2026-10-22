@@ -6,8 +6,8 @@
     <body class="min-h-screen font-sans">
         <header class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
             <a href="{{ route('home') }}" class="flex items-center gap-2.5 rounded-lg">
-                <x-application-logo class="size-9" />
-                <span class="font-bold text-ink">{{ config('app.name') }}</span>
+                <x-logo size="36" />
+                <span class="text-xl font-bold tracking-tight text-forest">{{ config('app.name') }}</span>
             </a>
 
             <nav aria-label="Account" class="flex items-center gap-2">
@@ -23,9 +23,9 @@
         <main id="main">
             <section class="mx-auto max-w-6xl px-4 pt-10 pb-16 sm:px-6 sm:pt-16 lg:px-8">
                 <div class="max-w-2xl">
-                    <x-badge tone="accent">For parents and hospitals</x-badge>
-                    <h1 class="mt-5 text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-                        Every vaccine, on time.
+                    <x-badge tone="primary" icon="heroicon-o-heart">For parents and hospitals</x-badge>
+                    <h1 class="mt-5 animate-fade-up text-4xl font-bold tracking-tight text-forest sm:text-6xl">
+                        {{ config('app.tagline') }}
                     </h1>
                     <p class="mt-5 text-lg text-ink-muted">
                         Add your child once and we'll build their full vaccination schedule from their date of birth.
@@ -42,7 +42,7 @@
                 </div>
             </section>
 
-            <section aria-labelledby="how-it-works" class="border-t border-line bg-surface">
+            <section aria-labelledby="how-it-works" class="border-t border-line bg-card">
                 <div class="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
                     <h2 id="how-it-works" class="text-2xl font-bold tracking-tight text-ink">How it works</h2>
 
@@ -52,7 +52,7 @@
                             ['heroicon-o-calendar-days', 'Book a slot', 'Choose a nearby hospital that has the vaccine in stock and pick a time that suits you.'],
                             ['heroicon-o-document-text', 'Keep a record', 'Each completed dose is added to a printable vaccination certificate.'],
                         ] as $i => [$icon, $title, $text])
-                            <li class="rounded-2xl bg-canvas p-6 ring-1 ring-line">
+                            <li class="animate-fade-up rounded-2xl bg-surface p-6 shadow-sm ring-1 ring-line">
                                 <span class="flex size-11 items-center justify-center rounded-xl bg-primary-700 text-white">
                                     <x-dynamic-component :component="$icon" class="size-6" aria-hidden="true" />
                                 </span>
@@ -69,7 +69,8 @@
 
         <footer class="border-t border-line">
             <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-ink-muted sm:px-6 lg:px-8">
-                {{ config('app.name') }}. Always follow the advice of your doctor or vaccination centre.
+                {{ config('app.name') }} · {{ config('app.tagline') }} Always follow the advice of your doctor or vaccination centre.
+                <span class="mt-1 block">Demo app: the vaccination schedule is demonstration data and must be verified against the official EPI Pakistan schedule.</span>
             </div>
         </footer>
     </body>

@@ -35,7 +35,7 @@
                                         <span class="text-ink"> · {{ $appointment->child->fullName() }}</span>
                                         <span class="block text-sm text-ink-muted">{{ $appointment->doseLabel() }}</span>
                                     </span>
-                                    <x-badge :tone="$appointment->status->tone()">{{ $appointment->status->label() }}</x-badge>
+                                    <x-status :status="$appointment->status" />
                                 </a>
                             </li>
                         @endforeach
@@ -95,7 +95,7 @@
         <x-card>
             <div class="flex items-start justify-between gap-4">
                 <h2 class="text-base font-semibold text-ink">Hospital details</h2>
-                <x-badge :tone="$hospital->status->tone()">{{ $hospital->status->label() }}</x-badge>
+                <x-status :status="$hospital->status" />
             </div>
             <dl class="mt-4 space-y-3 text-sm">
                 <div>

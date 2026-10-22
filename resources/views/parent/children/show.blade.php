@@ -40,7 +40,7 @@
         <ul class="mt-4 flex flex-wrap gap-2" aria-label="Doses by status">
             @foreach ([DoseStatus::Overdue, DoseStatus::Due, DoseStatus::Upcoming, DoseStatus::Completed, DoseStatus::Missed] as $status)
                 @if ($counts[$status->value] > 0)
-                    <li><x-badge :tone="$status->tone()">{{ $counts[$status->value] }} {{ strtolower($status->label()) }}</x-badge></li>
+                    <li><x-badge :tone="$status->tone()" :icon="$status->icon()">{{ $counts[$status->value] }} {{ strtolower($status->label()) }}</x-badge></li>
                 @endif
             @endforeach
         </ul>

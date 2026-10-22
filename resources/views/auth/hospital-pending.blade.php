@@ -13,15 +13,15 @@
 
         <ol class="mt-8 space-y-3 text-start text-sm">
             <li class="flex gap-3">
-                <x-badge tone="success">Done</x-badge>
+                <x-badge tone="success" icon="heroicon-o-check-circle">Done</x-badge>
                 <span class="text-ink">Registration submitted</span>
             </li>
             <li class="flex gap-3">
-                <x-badge tone="warning">Next</x-badge>
+                <x-badge tone="warning" icon="heroicon-o-clock">Next</x-badge>
                 <span class="text-ink">An administrator approves your hospital</span>
             </li>
             <li class="flex gap-3">
-                <x-badge tone="neutral">Then</x-badge>
+                <x-badge tone="neutral" icon="heroicon-o-calendar-days">Then</x-badge>
                 <span class="text-ink">Log in, add your vaccine stock and open appointment slots</span>
             </li>
         </ol>

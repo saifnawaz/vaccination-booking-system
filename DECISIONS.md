@@ -58,3 +58,44 @@ Each one is easy to change; the file or setting to look at is given.
 
 14. **The children list only shows its search box when a parent has more than 3
     children**; it is always paginated (12 per page).
+
+## Phase 5: brand and polish
+
+15. **Emerald for text is one step darker than the brand emerald.** White on `#1F8A5B` is
+    4.33:1, just under the 4.5:1 WCAG AA needs for normal text, and emerald links on sage
+    are 3.85:1. Buttons, links and active navigation therefore use `#1A754D` (5.7:1 with
+    white, 5.0:1 on sage). The brand `#1F8A5B` is used where 3:1 is enough: focus rings,
+    icons, chart bars, borders and the logo. Token: `--color-primary-700`.
+16. **Mustard is never text.** `#D4A72C` on white is 2.2:1. It is used as a fill under
+    forest text (5.4:1), as a tint behind dark mustard text `#6A5416` (6.5:1), and for the
+    unread-count badge.
+17. **Light emerald `#2FB37A` is only used for progress bars that always have a text
+    label next to them** ("11/19 doses done"). The bar itself is 2.7:1 on white, below the
+    3:1 for meaningful graphics, so it never carries information on its own.
+18. **Red is reserved** for overdue doses, errors and destructive actions. So a *declined*
+    appointment is grey, a *missed appointment* (no-show) is mustard, and the unread
+    badge is mustard, not red. An *expired* stock batch is red, as an error state
+    (it can't be used).
+19. **"Upcoming" doses are mustard**, as specified ("due/upcoming = mustard"). Due and
+    upcoming are told apart by their icon (bell vs clock) and label.
+20. **The forest colour is used for the top header; there is no sidebar.** The brief
+    mentions a sidebar, but every role already had a top header (and parents a bottom tab
+    bar on phones). Moving admin and hospital to a sidebar layout would be a bigger
+    restructure than a polish pass; easy to do later if wanted.
+21. **Cards are sage on a white page; fields, tables, menus and dialogs stay white.**
+22. **The logo's multiply blend only applies between its own bars** (`isolation: isolate`),
+    so the overlaps darken as designed and the mark stays visible on the dark forest header.
+    Each bar also carries an SVG `transform` attribute, so the mark renders correctly where
+    the app's CSS isn't loaded (the certificate, the PDF and the favicon).
+23. **Under `prefers-reduced-motion` the loading spinner keeps a gentle fade** instead of
+    rotating; everything else (page and card fades, slides, lifts, the logo intro,
+    skeleton shimmer) is switched off.
+24. **Skeleton loaders appear when a list is reloading** (submitting a filter, following
+    a pagination link or a filter tab). Pages are server-rendered, so there is no skeleton
+    on the very first load.
+25. **Admin and hospital tables become stacked cards on phones** (`.table-stack`), with each
+    cell labelled, instead of scrolling sideways.
+26. **Phone screenshots show one screen** (390×844), as a parent sees it; desktop
+    screenshots are full-page. A full-page phone capture paints the fixed bottom tab bar
+    halfway down the image.
+27. **The mail sender is `hello@tika.test`** (a reserved test domain), matching the app name.

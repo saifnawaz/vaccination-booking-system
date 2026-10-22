@@ -1,6 +1,6 @@
 @props(['title', 'icon' => 'heroicon-o-sparkles'])
 
-<div {{ $attributes->merge(['class' => 'flex flex-col items-center rounded-2xl border border-dashed border-line-strong bg-surface px-6 py-10 text-center']) }}>
+<div {{ $attributes->merge(['class' => 'flex flex-col items-center rounded-2xl border border-dashed border-line-strong bg-card px-6 py-10 text-center']) }}>
     <span class="flex size-12 items-center justify-center rounded-full bg-primary-50 text-primary-700">
         <x-dynamic-component :component="$icon" class="size-6" aria-hidden="true" />
     </span>

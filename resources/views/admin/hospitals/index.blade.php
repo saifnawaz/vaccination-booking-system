@@ -1,8 +1,8 @@
 <x-app-layout title="Hospitals">
     <x-page-header title="Hospitals" description="Approve new registrations and manage which hospitals can take bookings." />
 
-    <form method="GET" action="{{ route('admin.hospitals.index') }}" data-no-loading
-          class="mb-6 flex flex-col gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line sm:flex-row sm:items-end">
+    <form method="GET" action="{{ route('admin.hospitals.index') }}" data-no-loading data-filter
+          class="mb-6 flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-line sm:flex-row sm:items-end">
         <div class="flex-1">
             <x-input-label for="search" value="Search" />
             <div class="relative mt-1.5">
@@ -31,6 +31,7 @@
         </div>
     </form>
 
+    <x-list-region>
     @if ($hospitals->isEmpty())
         @if (array_filter($filters))
             <x-empty-state title="No hospitals match" icon="heroicon-o-magnifying-glass">
@@ -47,7 +48,7 @@
     @else
         <x-card :padding="false" class="overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-line text-sm">
+                <table class="table-stack min-w-full divide-y divide-line text-sm">
                     <caption class="sr-only">Hospitals</caption>
                     <thead class="bg-surface-muted text-start">
                         <tr>
@@ -61,21 +62,21 @@
                     <tbody class="divide-y divide-line">
                         @foreach ($hospitals as $hospital)
                             <tr class="hover:bg-canvas">
-                                <td class="px-5 py-4">
+                                <td data-label="" class="px-5 py-4">
                                     <a href="{{ route('admin.hospitals.show', $hospital) }}" class="font-semibold text-ink hover:text-primary-700 hover:underline">
                                         {{ $hospital->name }}
                                     </a>
                                     <p class="text-ink-muted">Registered {{ $hospital->created_at->format('j M Y') }}</p>
                                 </td>
-                                <td class="px-5 py-4 text-ink">{{ $hospital->city }}</td>
-                                <td class="px-5 py-4">
+                                <td data-label="City" class="px-5 py-4 text-ink">{{ $hospital->city }}</td>
+                                <td data-label="Contact" class="px-5 py-4">
                                     <p class="text-ink">{{ $hospital->user->name }}</p>
                                     <p class="text-ink-muted">{{ $hospital->user->email }}</p>
                                 </td>
-                                <td class="px-5 py-4">
-                                    <x-badge :tone="$hospital->status->tone()">{{ $hospital->status->label() }}</x-badge>
+                                <td data-label="Status" class="px-5 py-4">
+                                    <x-status :status="$hospital->status" />
                                 </td>
-                                <td class="px-5 py-4 text-end">
+                                <td data-label="" class="px-5 py-4 text-end">
                                     <x-button :href="route('admin.hospitals.show', $hospital)" variant="ghost" size="sm">
                                         View <span class="sr-only">{{ $hospital->name }}</span>
                                         <x-heroicon-o-chevron-right class="size-4" aria-hidden="true" />
@@ -90,4 +91,5 @@
 
         <div class="mt-6">{{ $hospitals->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

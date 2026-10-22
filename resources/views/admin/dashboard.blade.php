@@ -2,11 +2,11 @@
     <x-page-header title="Overview" description="Vaccinations, hospitals and stock across the whole system." />
 
     {{-- KPI row: every number is counted from the database. --}}
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 [&>*]:min-w-0">
         <x-stat label="Children registered" :value="$childrenRegistered" icon="heroicon-o-heart" />
         <x-stat label="Doses given this month" :value="$dosesThisMonth" icon="heroicon-o-check-circle" tone="success" />
         <x-stat label="Overdue doses" :value="$overdueDoses" icon="heroicon-o-exclamation-circle"
-                :tone="$overdueDoses > 0 ? 'accent' : 'neutral'" />
+                :tone="$overdueDoses > 0 ? 'danger' : 'neutral'" />
         <x-stat label="Hospitals awaiting approval" :value="$pendingHospitals" icon="heroicon-o-clock"
                 :tone="$pendingHospitals > 0 ? 'accent' : 'neutral'"
                 :href="route('admin.hospitals.index', ['status' => 'pending'])" />
@@ -21,7 +21,7 @@
         </p>
     @endif
 
-    <div class="mt-8 grid gap-6 lg:grid-cols-2">
+    <div class="mt-8 grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
         <x-bar-chart title="Doses given per month" description="Given through appointments in the app, last 6 months."
                      :data="$dosesByMonth" unit="dose" empty="No doses have been given through the app yet." />
 
@@ -35,7 +35,7 @@
                          'rejected', 'no_show' => 'heroicon-o-x-circle', default => 'heroicon-o-minus-circle' }])->all()"
                      empty="No appointments this month yet." />
 
-        <section aria-labelledby="recent-heading" class="rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line">
+        <section aria-labelledby="recent-heading" class="rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line">
             <div class="flex items-end justify-between gap-4">
                 <h3 id="recent-heading" class="text-base font-semibold text-ink">Recent activity</h3>
                 <a href="{{ route('admin.activity.index') }}" class="text-sm font-semibold text-primary-700 hover:underline">Activity log</a>

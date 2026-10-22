@@ -7,7 +7,7 @@
 
     @include('parent.book.partials.selected-doses')
 
-    <form method="GET" action="{{ route('parent.book.hospitals', $child) }}" data-no-loading class="mb-6 flex gap-2">
+    <form method="GET" action="{{ route('parent.book.hospitals', $child) }}" data-no-loading data-filter class="mb-6 flex gap-2">
         @foreach ($doseQuery['doses'] as $id)
             <input type="hidden" name="doses[]" value="{{ $id }}">
         @endforeach
@@ -34,7 +34,7 @@
             @foreach ($hospitals as $hospital)
                 <li>
                     <a href="{{ route('parent.book.slots', [$child, $hospital, ...$doseQuery]) }}"
-                       class="flex items-center justify-between gap-4 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line transition hover:ring-primary-300">
+                       class="flex items-center justify-between gap-4 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:ring-primary-300">
                         <span class="min-w-0">
                             <span class="block font-semibold text-ink">{{ $hospital->name }}</span>
                             <span class="mt-0.5 flex items-center gap-1 text-sm text-ink-muted">

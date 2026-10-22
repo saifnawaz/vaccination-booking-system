@@ -7,78 +7,116 @@
 @source '../../storage/framework/views/*.php';
 
 /*
- * Design tokens. Every colour in the UI comes from here, so the palette can be
- * changed in one place. Use the semantic names (primary, accent, success, …)
- * in views, never raw Tailwind palette colours like teal-700 or red-500.
+ * Tika design tokens. Every colour in the UI comes from here, so the palette can
+ * be changed in one place. Use the semantic names (primary, accent, success, …)
+ * in views, never raw Tailwind palette colours.
  *
- * Contrast was measured (WCAG 2.1 formula) for every text pairing the views use:
- *   text, 4.5:1 minimum: white on primary-600/700/800 (5.8–10.1), white on accent-700 (6.0),
- *     white on danger-600 (5.6), ink / ink-muted / ink-subtle on canvas, surface and
- *     surface-muted (4.7–13.9), success-700 / warning-800 / danger-700 / accent-700 on
- *     their -50 tints (5.6–6.4) and on surface (6.0–7.3), primary-700 links on canvas (7.3).
- *   UI boundaries, 3:1 minimum: line-input field borders (3.5–3.8), primary-500 focus ring (3.8).
- * Avoid: white text on accent-500/600 (below 4.5:1) and line / line-strong as the only
- * outline of a form control (decorative dividers only).
+ * Brand colours: forest #0F3D2E, emerald #1F8A5B, light emerald #2FB37A,
+ * sage #EEF3EA, mustard #D4A72C, alert red #C8352E.
+ *
+ * WCAG AA, measured with the WCAG 2.1 formula (see DECISIONS.md):
+ *   Emerald #1F8A5B is 4.33:1 with white, just under 4.5:1, so it is used for
+ *   non-text marks (focus rings, borders, icons, chart bars: 3:1 needed) and the
+ *   text-carrying emerald is primary-700 #1A754D (5.7:1 on white, 5.0:1 on sage,
+ *   5.7:1 for white text on it).
+ *   Mustard #D4A72C is 2.2:1 on white, so it is only ever a fill under dark text
+ *   (forest on mustard 5.4:1) or a tint; mustard text is warning-800 #6A5416 (7.3:1).
+ *   Red #C8352E: 5.2:1 for white text and as text on white. Red is reserved for
+ *   overdue doses, errors and destructive actions.
+ *   Every pairing the views use is re-measured by scripts/check-contrast.php.
  */
 @theme {
     --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
 
-    /* Deep teal: brand, primary actions, links, focus rings. */
-    --color-primary-50: #effaf8;
-    --color-primary-100: #d5f0eb;
-    --color-primary-200: #abe0d7;
-    --color-primary-300: #78c8bc;
-    --color-primary-400: #47aa9e;
-    --color-primary-500: #2b8d82;
-    --color-primary-600: #1f716a;
-    --color-primary-700: #1b5b56;
-    --color-primary-800: #194946;
-    --color-primary-900: #173d3b;
-    --color-primary-950: #082322;
+    /* Emerald: brand, primary actions, links, active navigation. */
+    --color-primary-50: #eaf6ef;
+    --color-primary-100: #d3eedf;
+    --color-primary-200: #a8dcc0;
+    --color-primary-300: #72c79c;
+    --color-primary-400: #46b884;
+    --color-primary-500: #2fb37a; /* light emerald: progress bars, highlights (no text) */
+    --color-primary-600: #1f8a5b; /* emerald: focus rings, icons, chart bars (no text) */
+    --color-primary-700: #1a754d; /* emerald for text and text-bearing fills */
+    --color-primary-800: #135337;
+    --color-primary-900: #10452e;
+    --color-primary-950: #0f3d2e;
 
-    /* Soft coral: warnings, attention, "this dose is due". */
-    --color-accent-50: #fff4f1;
-    --color-accent-100: #ffe6df;
-    --color-accent-200: #ffcdbf;
-    --color-accent-300: #ffa892;
-    --color-accent-400: #fa7d61;
-    --color-accent-500: #ef5d3d;
-    --color-accent-600: #d84629;
-    --color-accent-700: #b4371f;
-    --color-accent-800: #922f1f;
-    --color-accent-900: #782b1f;
+    /* Forest: header and dark accents. */
+    --color-forest: #0f3d2e;
+    --color-forest-soft: #1b5a44;
 
-    /* Warm neutrals: page background, cards, borders, text. */
-    --color-canvas: #faf7f2;
-    --color-surface: #ffffff;
-    --color-surface-muted: #f4efe7;
-    --color-line: #e6dfd4;
-    --color-line-strong: #cfc5b6;
-    --color-line-input: #8c8273;
-    --color-ink: #1d2a29;
-    --color-ink-muted: #56625f;
-    --color-ink-subtle: #626c69;
+    /* Mustard: "due", warnings, low stock. Fill or tint only, never as text. */
+    --color-accent-50: #fbf3dc;
+    --color-accent-100: #f5e3ae;
+    --color-accent-200: #ebcf7e;
+    --color-accent-300: #dfbb52;
+    --color-accent-400: #d4a72c;
+    --color-accent-500: #d4a72c;
+    --color-accent-600: #b48e25;
+    --color-accent-700: #6a5416;
+    --color-accent-800: #5f4b14;
+    --color-accent-900: #4a3a10;
 
-    /* Status: completed / due / overdue (and success / warning / error messages). */
-    --color-success-50: #ebf6ef;
-    --color-success-100: #d3ecdc;
-    --color-success-500: #2f9a5c;
-    --color-success-700: #1f6b3f;
+    /* Neutrals: white page, sage cards, borders, text. */
+    --color-canvas: #ffffff;
+    --color-surface: #ffffff;          /* fields, tables, menus, dialogs */
+    --color-card: #eef3ea;             /* sage: cards and soft sections */
+    --color-surface-muted: #e3ebdd;    /* table headers, chips, tracks */
+    --color-line: #d8e2d1;
+    --color-line-strong: #c0ceb7;
+    --color-line-input: #6f8272;       /* form-control borders: 3:1 on white and sage */
+    --color-ink: #16261e;
+    --color-ink-muted: #46574d;
+    --color-ink-subtle: #556759;
 
-    --color-warning-50: #fdf5e1;
-    --color-warning-100: #faeac2;
-    --color-warning-500: #d99a16;
-    --color-warning-800: #7a5205;
+    /* Status: completed (green) / due and upcoming (mustard) / overdue and errors (red) / missed (grey). */
+    --color-success-50: #eaf6ef;
+    --color-success-100: #d3eedf;
+    --color-success-500: #2fb37a;
+    --color-success-700: #1a754d;
 
-    --color-danger-50: #fdeceb;
-    --color-danger-100: #fad5d2;
-    --color-danger-500: #d9443a;
-    --color-danger-600: #c0352c;
-    --color-danger-700: #a12a22;
+    --color-warning-50: #fbf3dc;
+    --color-warning-100: #f5e3ae;
+    --color-warning-400: #d4a72c;
+    --color-warning-500: #d4a72c;
+    --color-warning-800: #6a5416;
+
+    --color-danger-50: #fbeceb;
+    --color-danger-100: #f5d3d1;
+    --color-danger-500: #c8352e;
+    --color-danger-600: #c8352e;
+    --color-danger-700: #a02a25;
 
     /* Charts: one hue for single-series magnitude; the stronger step marks hover/focus. */
-    --color-chart: var(--color-primary-500);
-    --color-chart-strong: var(--color-primary-700);
+    --color-chart: var(--color-primary-600);
+    --color-chart-strong: var(--color-primary-950);
+
+    /* Motion: subtle and fast, ease-out, 150–250ms. All of it is switched off for
+       prefers-reduced-motion below. */
+    --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+    --animate-fade-in: fade-in 200ms var(--ease-out-soft) both;
+    --animate-fade-up: fade-up 220ms var(--ease-out-soft) both;
+    --animate-shimmer: shimmer 1.4s ease-in-out infinite;
+
+    @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fade-up {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+    }
+
+    @keyframes grow-x {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
+    }
+
+    @keyframes shimmer {
+        from { background-position: 200% 0; }
+        to { background-position: -200% 0; }
+    }
 }
 
 @layer base {
@@ -86,12 +124,105 @@
         @apply bg-canvas text-ink antialiased;
     }
 
-    /* Visible keyboard focus everywhere, not only on form fields. */
+    /* Visible keyboard focus everywhere, not only on form fields (emerald, 4.3:1 on white). */
     :focus-visible {
-        @apply outline-2 outline-offset-2 outline-primary-500;
+        @apply outline-2 outline-offset-2 outline-primary-600;
     }
 
     [x-cloak] {
         display: none !important;
+    }
+}
+
+@layer components {
+    /* Skeleton placeholder shown while a list reloads (see <x-list-region>). */
+    .skeleton {
+        background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-card) 50%, var(--color-surface-muted) 75%);
+        background-size: 200% 100%;
+        animation: var(--animate-shimmer);
+        border-radius: 0.5rem;
+    }
+
+    /*
+     * Tables that turn into stacked cards on phones. Add class="table-stack" to the
+     * <table> and data-label="Column name" to each <td>; below md each row becomes a
+     * block and each cell shows its column name. Desktop is an ordinary table.
+     */
+    @media (width < 48rem) {
+        .table-stack thead { @apply sr-only; }
+        .table-stack, .table-stack tbody, .table-stack tr, .table-stack td { display: block; width: 100%; }
+        .table-stack tbody { border: 0; }
+        .table-stack tr { @apply border-b border-line px-4 py-3; }
+        .table-stack tr:last-child { border-bottom: 0; }
+        /* Key/value rows: column name on the left, the cell content stacked on the right. */
+        .table-stack td { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); column-gap: 1rem; @apply px-0! py-1.5! text-start!; }
+        .table-stack td > * { grid-column: 2; justify-self: start; }
+        .table-stack td[data-label]::before {
+            content: attr(data-label);
+            grid-column: 1;
+            grid-row: 1 / span 9;
+            @apply text-sm font-medium text-ink-muted;
+        }
+        .table-stack td[data-label=""] { grid-template-columns: minmax(0, 1fr); }
+        .table-stack td[data-label=""] > * { grid-column: 1; }
+        .table-stack td[data-label=""]::before { content: none; }
+    }
+
+    /* Logo mark: bars rotate around the centre of the 100×100 view box. */
+    .tika-bar {
+        transform-box: view-box;
+        transform-origin: 50px 50px;
+        transform: rotate(var(--r));
+    }
+
+    /* Login/register intro: bars rotate into place one after another, then the wordmark fades up. */
+    .tika-intro .tika-bar {
+        animation: tika-bar-in 600ms var(--ease-out-soft) both;
+        animation-delay: var(--d);
+    }
+
+    .tika-intro-word {
+        animation: fade-up 400ms var(--ease-out-soft) 360ms both;
+    }
+
+    /* Loading spinner: the mark, rotating slowly. */
+    .tika-spin {
+        animation: tika-spin 1.6s linear infinite;
+    }
+}
+
+@keyframes tika-bar-in {
+    from { transform: rotate(0deg); opacity: 0; }
+    40% { opacity: 1; }
+    to { transform: rotate(var(--r)); opacity: 1; }
+}
+
+@keyframes tika-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes tika-pulse {
+    50% { opacity: 0.45; }
+}
+
+/* Respect reduced motion: no page fades, slides, lifts, logo intro or shimmer.
+   The spinner keeps a gentle fade so there is still loading feedback. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        animation-delay: 0ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .tika-spin {
+        animation: tika-pulse 1.6s ease-in-out infinite !important;
+    }
+
+    .skeleton {
+        animation: none !important;
     }
 }

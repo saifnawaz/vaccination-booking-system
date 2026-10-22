@@ -35,7 +35,7 @@
                                     <li class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                                             <span class="font-semibold text-ink">{{ $appointment->doseLabel() }}</span>
-                                            <x-badge :tone="$appointment->status->tone()">{{ $appointment->status->label() }}</x-badge>
+                                            <x-status :status="$appointment->status" />
                                         </div>
 
                                         @if ($appointment->canBeChangedByParent())
@@ -69,7 +69,7 @@
     <section aria-labelledby="past-heading" class="mt-10">
         <h2 id="past-heading" class="mb-3 text-lg font-semibold text-ink">History</h2>
 
-        <form method="GET" action="{{ route('parent.appointments.index') }}" data-no-loading class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+        <form method="GET" action="{{ route('parent.appointments.index') }}" data-no-loading data-filter class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
             @if ($children->count() > 1)
                 <div class="sm:w-52">
                     <x-input-label for="child" value="Child" />
@@ -98,6 +98,7 @@
             </div>
         </form>
 
+        <x-list-region :rows="4">
         @if ($past->isEmpty())
             <p class="text-sm text-ink-muted">
                 {{ array_filter($filters) ? 'No past appointments match.' : 'Past, cancelled and declined appointments will appear here.' }}
@@ -114,12 +115,13 @@
                                     <p class="mt-1 text-sm text-ink">Reason: {{ $appointment->reason }}</p>
                                 @endif
                             </div>
-                            <x-badge :tone="$appointment->status->tone()">{{ $appointment->status->label() }}</x-badge>
+                            <x-status :status="$appointment->status" />
                         </li>
                     @endforeach
                 </ul>
             </x-card>
             <div class="mt-6">{{ $past->links() }}</div>
         @endif
+        </x-list-region>
     </section>
 </x-app-layout>

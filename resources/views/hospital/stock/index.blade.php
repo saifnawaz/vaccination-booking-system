@@ -18,17 +18,17 @@
         {{-- Per-vaccine totals --}}
         <section aria-labelledby="by-vaccine" class="mb-8">
             <h2 id="by-vaccine" class="mb-3 text-lg font-semibold text-ink">By vaccine</h2>
-            <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <ul class="grid grid-cols-2 gap-3 lg:grid-cols-3">
                 @foreach ($summary->vaccines as $row)
                     <li @class([
                         'rounded-2xl p-4 ring-1',
                         'bg-accent-50 ring-accent-200' => $row['low'],
-                        'bg-surface ring-line' => ! $row['low'],
+                        'bg-card ring-line' => ! $row['low'],
                     ])>
                         <div class="flex items-start justify-between gap-3">
                             <p class="font-semibold text-ink">{{ $row['vaccine']->name }}</p>
                             @if ($row['low'])
-                                <x-badge tone="accent">Low stock</x-badge>
+                                <x-badge tone="accent" icon="heroicon-o-exclamation-triangle">Low stock</x-badge>
                             @endif
                         </div>
                         <p class="mt-2 text-2xl font-bold tabular-nums text-ink">{{ number_format($row['usable']) }}
@@ -48,8 +48,8 @@
         <section aria-labelledby="batches">
             <h2 id="batches" class="mb-3 text-lg font-semibold text-ink">Batches</h2>
 
-            <form method="GET" action="{{ route('hospital.stock.index') }}" data-no-loading
-                  class="mb-4 flex flex-col gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line sm:flex-row sm:items-end">
+            <form method="GET" action="{{ route('hospital.stock.index') }}" data-no-loading data-filter
+                  class="mb-4 flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-line sm:flex-row sm:items-end">
                 <div class="flex-1">
                     <x-input-label for="search" value="Batch number" />
                     <x-text-input id="search" name="search" type="search" :value="$filters['search'] ?? ''" class="mt-1.5" />
@@ -80,12 +80,13 @@
                 </div>
             </form>
 
+            <x-list-region>
             @if ($batches->isEmpty())
                 <x-empty-state title="No batches match" icon="heroicon-o-magnifying-glass">Try a different filter.</x-empty-state>
             @else
                 <x-card :padding="false" class="overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-line text-sm">
+                        <table class="table-stack min-w-full divide-y divide-line text-sm">
                             <caption class="sr-only">Stock batches</caption>
                             <thead class="bg-surface-muted">
                                 <tr>
@@ -100,25 +101,25 @@
                             <tbody class="divide-y divide-line">
                                 @foreach ($batches as $batch)
                                     <tr @class(['hover:bg-canvas', 'bg-danger-50/50' => $batch->isExpired()])>
-                                        <td class="px-5 py-4">
+                                        <td data-label="" class="px-5 py-4">
                                             <p class="font-semibold text-ink">{{ $batch->vaccine->name }}</p>
                                             <p class="font-mono text-ink-muted">{{ $batch->batch_number }}</p>
                                         </td>
-                                        <td class="px-5 py-4">
+                                        <td data-label="Expires" class="px-5 py-4">
                                             <p class="text-ink">{{ $batch->expiry_date->format('j M Y') }}</p>
                                             @if ($batch->isExpired())
-                                                <x-badge tone="danger" class="mt-1">Expired</x-badge>
+                                                <x-badge tone="danger" icon="heroicon-o-exclamation-circle" class="mt-1">Expired</x-badge>
                                             @elseif ($batch->isExpiringSoon())
-                                                <x-badge tone="warning" class="mt-1">Expires in {{ (int) today()->diffInDays($batch->expiry_date) }} days</x-badge>
+                                                <x-badge tone="warning" icon="heroicon-o-clock" class="mt-1">Expires in {{ (int) today()->diffInDays($batch->expiry_date) }} days</x-badge>
                                             @endif
                                         </td>
-                                        <td class="px-5 py-4 text-end tabular-nums text-ink">{{ number_format($batch->quantity) }}</td>
-                                        <td class="px-5 py-4 text-end tabular-nums text-ink-muted">{{ number_format($batch->reserved) }}</td>
-                                        <td class="px-5 py-4 text-end font-semibold tabular-nums {{ $batch->isExpired() ? 'text-ink-subtle line-through' : 'text-ink' }}">
+                                        <td data-label="On hand" class="px-5 py-4 text-end tabular-nums text-ink">{{ number_format($batch->quantity) }}</td>
+                                        <td data-label="Reserved" class="px-5 py-4 text-end tabular-nums text-ink-muted">{{ number_format($batch->reserved) }}</td>
+                                        <td data-label="Available" class="px-5 py-4 text-end font-semibold tabular-nums {{ $batch->isExpired() ? 'text-ink-subtle line-through' : 'text-ink' }}">
                                             {{ number_format($batch->available()) }}
                                             @if ($batch->isExpired()) <span class="sr-only">(expired, not usable)</span> @endif
                                         </td>
-                                        <td class="px-5 py-4">
+                                        <td data-label="" class="px-5 py-4">
                                             <div class="flex justify-end gap-1">
                                                 <x-button :href="route('hospital.stock.edit', $batch)" variant="ghost" size="sm">
                                                     Adjust <span class="sr-only">batch {{ $batch->batch_number }}</span>
@@ -144,6 +145,7 @@
 
                 <div class="mt-6">{{ $batches->links() }}</div>
             @endif
+            </x-list-region>
         </section>
     @endif
 </x-app-layout>

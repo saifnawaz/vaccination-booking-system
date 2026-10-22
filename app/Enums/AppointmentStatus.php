@@ -32,14 +32,29 @@ enum AppointmentStatus: string
         };
     }
 
+    /**
+     * Red is reserved for overdue doses, errors and destructive actions, so a
+     * declined or missed appointment is grey or mustard, not red.
+     */
     public function tone(): string
     {
         return match ($this) {
-            self::Pending => 'warning',
+            self::Pending, self::NoShow => 'warning',
             self::Approved => 'primary',
             self::Completed => 'success',
-            self::Rejected, self::NoShow => 'danger',
-            self::Cancelled => 'neutral',
+            self::Rejected, self::Cancelled => 'neutral',
+        };
+    }
+
+    public function icon(): string
+    {
+        return match ($this) {
+            self::Pending => 'heroicon-o-clock',
+            self::Approved => 'heroicon-o-calendar-days',
+            self::Completed => 'heroicon-o-check-circle',
+            self::Rejected => 'heroicon-o-x-circle',
+            self::Cancelled => 'heroicon-o-minus-circle',
+            self::NoShow => 'heroicon-o-exclamation-triangle',
         };
     }
 

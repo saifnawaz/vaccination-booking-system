@@ -5,13 +5,15 @@
     $latest = $user->notifications()->limit(5)->get();
 @endphp
 
-<x-dropdown align="right" width="w-80 sm:w-96">
+{{-- On phones the panel is pinned to the viewport (1rem from each edge) so it never runs off-screen. --}}
+<x-dropdown align="right" width="w-96 max-sm:fixed max-sm:inset-x-4 max-sm:top-16 max-sm:w-auto">
     <x-slot name="trigger">
-        <button type="button" class="relative rounded-lg p-2 text-ink-muted hover:bg-surface-muted hover:text-ink"
+        <button type="button" class="relative rounded-lg p-2 text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
                 aria-label="Notifications{{ $unread ? ", {$unread} unread" : '' }}">
             <x-heroicon-o-bell class="size-6" aria-hidden="true" />
             @if ($unread)
-                <span class="absolute -top-0.5 -right-0.5 flex min-w-5 items-center justify-center rounded-full bg-danger-600 px-1 text-xs font-bold text-white" aria-hidden="true">
+                {{-- Mustard fill with forest text (5.4:1): an unread count is news, not an error, so not red. --}}
+                <span class="absolute -top-0.5 -right-0.5 flex min-w-5 items-center justify-center rounded-full bg-accent-400 px-1 text-xs font-bold text-forest ring-2 ring-forest" aria-hidden="true">
                     {{ $unread > 9 ? '9+' : $unread }}
                 </span>
             @endif

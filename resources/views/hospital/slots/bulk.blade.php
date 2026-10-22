@@ -13,8 +13,9 @@
         $checkedDays = array_map('intval', old('weekdays', [1, 2, 3, 4, 5, 6]));
     @endphp
 
-    {{-- The estimate is a convenience only; the server works out and reports the real numbers. --}}
-    <x-card class="max-w-2xl"
+    {{-- The estimate is a convenience only; the server works out and reports the real numbers.
+         x-data sits on a plain div: Blade directives like @js() aren't compiled inside component attributes. --}}
+    <div class="max-w-2xl"
             x-data="{
                 from: @js(old('date_from', today()->toDateString())),
                 to: @js(old('date_to', today()->addWeeks(4)->toDateString())),
@@ -33,6 +34,7 @@
                     return count;
                 },
             }">
+    <x-card>
         <form method="POST" action="{{ route('hospital.slots.bulk.store') }}" class="space-y-6">
             @csrf
 
@@ -53,7 +55,7 @@
                                    x-model.number="days" @checked(in_array($number, $checkedDays, true))>
                             <span class="inline-flex min-w-14 cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold ring-1 ring-inset ring-line-input
                                          peer-checked:bg-primary-700 peer-checked:text-white peer-checked:ring-primary-700
-                                         peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-500">
+                                         peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary-600">
                                 {{ $label }}
                             </span>
                         </label>
@@ -85,4 +87,5 @@
             </div>
         </form>
     </x-card>
+    </div>
 </x-app-layout>

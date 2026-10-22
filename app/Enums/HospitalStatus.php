@@ -29,6 +29,15 @@ enum HospitalStatus: string
         };
     }
 
+    public function icon(): string
+    {
+        return match ($this) {
+            self::Pending => 'heroicon-o-clock',
+            self::Active => 'heroicon-o-check-circle',
+            self::Inactive => 'heroicon-o-no-symbol',
+        };
+    }
+
     /**
      * Statuses an admin may move a hospital to from this one.
      *
