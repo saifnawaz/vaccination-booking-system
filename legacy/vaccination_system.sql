@@ -48,7 +48,7 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`id`, `name`, `parent_name`, `child_id`, `hospital_id`, `vaccine_id`, `email`, `appointment_date`, `appointment_time`, `status`, `notes`, `created_at`, `parent_id`) VALUES
-(27, '', 'Abdullah ul', 10, 7, 62, 'amd@gmail.com', '2025-02-06', '18:14:00', 'approved', NULL, '2025-02-05 06:11:09', 2);
+(27, '', 'Parent One', 10, 7, 62, 'user27@example.com', '2025-02-06', '18:14:00', 'approved', NULL, '2025-02-05 06:11:09', 2);
 
 -- --------------------------------------------------------
 
@@ -73,13 +73,13 @@ CREATE TABLE `children` (
 --
 
 INSERT INTO `children` (`id`, `parent_id`, `first_name`, `last_name`, `dob`, `gender`, `blood_group`, `medical_conditions`, `created_at`) VALUES
-(7, 2, 'jawad', ' ul-bahar', '2002-01-08', 'male', 'A+', 'Asthma ', '2025-01-18 03:09:50'),
-(8, 6, 'Mustafa', 'Tasir', '2005-01-12', 'male', 'O+', 'Nothing', '2025-01-20 15:35:41'),
-(9, 4, 'jawad babu', ' ul-bahar', '2025-01-21', 'male', 'c++', 'corona', '2025-01-21 03:06:33'),
-(10, 2, 'faradics dadu', 'khan', '2024-04-04', 'female', 'c++', 'corona', '2025-01-21 03:12:36'),
-(11, 7, 'jawad babu', ' ul-bahar', '2003-02-05', 'other', 'c++', 'corona', '2025-01-23 03:28:16'),
-(12, 2, 'bilal', 'khan', '2021-02-02', 'male', 'a+', 'good', '2025-02-03 07:43:35'),
-(13, 2, 'Mustafa', 'Tasir', '2025-02-03', 'female', 'O+', 'Nothing', '2025-02-05 05:07:14');
+(7, 2, 'child1', ' lastname1', '2002-01-08', 'male', 'A+', 'Asthma ', '2025-01-18 03:09:50'),
+(8, 6, 'Child2', 'Lastname2', '2005-01-12', 'male', 'O+', 'Nothing', '2025-01-20 15:35:41'),
+(9, 4, 'child3 test', ' lastname1', '2025-01-21', 'male', 'c++', 'corona', '2025-01-21 03:06:33'),
+(10, 2, 'child4 test', 'lastname4', '2024-04-04', 'female', 'c++', 'corona', '2025-01-21 03:12:36'),
+(11, 7, 'child3 test', ' lastname1', '2003-02-05', 'other', 'c++', 'corona', '2025-01-23 03:28:16'),
+(12, 2, 'child5', 'lastname4', '2021-02-02', 'male', 'a+', 'good', '2025-02-03 07:43:35'),
+(13, 2, 'Child2', 'Lastname2', '2025-02-03', 'female', 'O+', 'Nothing', '2025-02-05 05:07:14');
 
 -- --------------------------------------------------------
 
@@ -100,8 +100,8 @@ CREATE TABLE `contact` (
 --
 
 INSERT INTO `contact` (`id`, `name`, `email`, `subject`, `message`) VALUES
-(21, 'wdwd', 'dadawd@gmail.com', 'dwadad', 'dadawda'),
-(22, 'wdwd', 'dadawd@gmail.com', 'dwadad', 'dadawda');
+(21, 'wdwd', 'contact1@example.com', 'dwadad', 'dadawda'),
+(22, 'wdwd', 'contact1@example.com', 'dwadad', 'dadawda');
 
 -- --------------------------------------------------------
 
@@ -122,17 +122,17 @@ CREATE TABLE `feedback` (
 --
 
 INSERT INTO `feedback` (`id`, `user_name`, `user_email`, `user_feedback`, `user_exp`) VALUES
-(4, 'Abdullah ul', 'abdullahmurshid931@gmail.com', 'hi here is feed back', '4'),
-(5, 'Abdullah ul', 'abdullahmurshid931@gmail.com', 'dgfgdfg', '1'),
-(6, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '', ''),
-(7, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '', ''),
-(8, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '', ''),
-(9, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '', ''),
-(10, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '', ''),
-(11, 'Abdullah ul', 'abdullahmurshid931@gmail.com', 'wdwd', '2'),
-(12, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '', ''),
-(13, 'Abdullah ul', 'abdullahmurshid931@gmail.com', 'dwdwd', '3'),
-(14, 'Abdullah ul', 'abdullahmurshid931@gmail.com', '555', '3');
+(4, 'Parent One', 'parent1@example.com', 'hi here is feed back', '4'),
+(5, 'Parent One', 'parent1@example.com', 'dgfgdfg', '1'),
+(6, 'Parent One', 'parent1@example.com', '', ''),
+(7, 'Parent One', 'parent1@example.com', '', ''),
+(8, 'Parent One', 'parent1@example.com', '', ''),
+(9, 'Parent One', 'parent1@example.com', '', ''),
+(10, 'Parent One', 'parent1@example.com', '', ''),
+(11, 'Parent One', 'parent1@example.com', 'wdwd', '2'),
+(12, 'Parent One', 'parent1@example.com', '', ''),
+(13, 'Parent One', 'parent1@example.com', 'dwdwd', '3'),
+(14, 'Parent One', 'parent1@example.com', '555', '3');
 
 -- --------------------------------------------------------
 
@@ -158,20 +158,20 @@ CREATE TABLE `hospitals` (
 --
 
 INSERT INTO `hospitals` (`id`, `user_id`, `hospital_name`, `address`, `phone`, `email`, `password`, `role`, `status`, `created_at`) VALUES
-(2, NULL, 'Jinnah Hospital 01C', 'Karachi01C', '12687465435701', 'jinnah01C@gmail.com', '321', 'hospital', 'active', '2025-01-07 15:32:10'),
-(5, NULL, 'Ziauddin', 'Karachi', '030202166151', 'zia@gmail.com', '12345', 'hospital', 'active', '2025-01-28 08:01:37'),
-(6, NULL, 'Civil Hospital', 'Saddar karachi', '+021558741441', 'civilhos@gmail.com', '123', 'hospital', 'active', '2025-02-02 11:13:11'),
-(7, NULL, 'Civil Hospital', 'Saddar karachi', '+021558741441', 'civilhos@gmail.com', '123', 'hospital', 'active', '2025-02-02 11:13:41'),
-(8, NULL, 'City Medical Center', 'Korangi Road, Karachi', '+021558742255', 'citymedcenter@gmail.com', '456', 'hospital', 'active', '2025-02-02 11:16:10'),
-(9, NULL, 'Sunrise Hospital', 'DHA, Karachi', '+02156789432', 'sunrisehospital@gmail.com', '789', 'hospital', 'active', '2025-02-02 11:16:10'),
-(10, NULL, 'Metro Hospital', 'Karachi Cantt.', '+021123456789', 'metrohospital@gmail.com', 'abc123', 'hospital', 'active', '2025-02-02 11:16:10'),
-(11, NULL, 'Shifa International Hospital', 'Islamabad', '+05123456789', 'shifainternational@gmail.com', 'qwerty', 'hospital', 'active', '2025-02-02 11:16:10'),
-(12, NULL, 'Lahore General Hospital', 'Gulberg, Lahore', '+0429876543', 'lahoregenhosp@gmail.com', 'password123', 'hospital', 'active', '2025-02-02 11:16:10'),
-(13, NULL, 'Karachi Medical Center', 'Clifton Karachi', '+02133221144', 'karachimedcenter@gmail.com', 'mypassword', 'hospital', 'active', '2025-02-02 11:16:10'),
-(14, NULL, 'Agha Khan Hospital', 'Shahra-e-Faisal, Karachi', '+021556667788', 'aghakhanhosp@gmail.com', 'securepass', 'hospital', 'active', '2025-02-02 11:16:10'),
-(15, NULL, 'Medicare Hospital', 'Rawalpindi', '+05122334455', 'medicarehosp@gmail.com', 'pass1234', 'hospital', 'active', '2025-02-02 11:16:10'),
-(16, NULL, 'Peshawar Health Center', 'University Road, Peshawar', '+0912323456', 'peshawarhealthcenter@gmail.com', 'admin1234', 'hospital', 'inactive', '2025-02-02 11:16:10'),
-(17, NULL, 'jiinn', 'sshdiugfibv', '972493874634', 'jinn@gmail.com', '123', 'hospital', 'active', '2025-02-03 12:53:47'),
+(2, NULL, 'Sample Hospital 01C', 'City01C', '10000000000002', 'hospital2@example.com', 'pass2', 'hospital', 'active', '2025-01-07 15:32:10'),
+(5, NULL, 'Sample Hospital 5', 'City A', '030000000005', 'hospital5@example.com', 'pass5', 'hospital', 'active', '2025-01-28 08:01:37'),
+(6, NULL, 'Sample Hospital 6', 'Example Road, City A', '+020000000006', 'hospital6@example.com', 'pass6', 'hospital', 'active', '2025-02-02 11:13:11'),
+(7, NULL, 'Sample Hospital 6', 'Example Road, City A', '+020000000006', 'hospital6@example.com', 'pass6', 'hospital', 'active', '2025-02-02 11:13:41'),
+(8, NULL, 'Sample Hospital 8', 'Example Road, City A', '+020000000008', 'hospital8@example.com', 'pass8', 'hospital', 'active', '2025-02-02 11:16:10'),
+(9, NULL, 'Sample Hospital 9', 'Example Road, City A', '+02000000009', 'hospital9@example.com', 'pass9', 'hospital', 'active', '2025-02-02 11:16:10'),
+(10, NULL, 'Sample Hospital 10', 'City A', '+020000000010', 'hospital10@example.com', 'pass10', 'hospital', 'active', '2025-02-02 11:16:10'),
+(11, NULL, 'Sample Hospital 11', 'City B', '+05000000011', 'hospital11@example.com', 'pass11', 'hospital', 'active', '2025-02-02 11:16:10'),
+(12, NULL, 'Sample Hospital 12', 'Example Road, City C', '+0400000012', 'hospital12@example.com', 'pass12', 'hospital', 'active', '2025-02-02 11:16:10'),
+(13, NULL, 'Sample Hospital 13', 'Example Road City A', '+02000000013', 'hospital13@example.com', 'pass13', 'hospital', 'active', '2025-02-02 11:16:10'),
+(14, NULL, 'Sample Hospital 14', 'Example Road, City A', '+020000000014', 'hospital14@example.com', 'pass14', 'hospital', 'active', '2025-02-02 11:16:10'),
+(15, NULL, 'Sample Hospital 15', 'City D', '+05000000015', 'hospital15@example.com', 'pass15', 'hospital', 'active', '2025-02-02 11:16:10'),
+(16, NULL, 'Sample Hospital 16', 'Example Road, City E', '+0900000016', 'hospital16@example.com', 'pass16', 'hospital', 'inactive', '2025-02-02 11:16:10'),
+(17, NULL, 'testhosp', 'sshdiugfibv', '000000000017', 'hospital17@example.com', 'pass17', 'hospital', 'active', '2025-02-03 12:53:47'),
 (18, NULL, '', '', '', '', '', 'hospital', 'active', '2025-02-05 10:18:54'),
 (19, NULL, '', '', '', '', '', 'hospital', 'active', '2025-02-05 10:29:53');
 
@@ -211,12 +211,12 @@ CREATE TABLE `parents` (
 --
 
 INSERT INTO `parents` (`id`, `name`, `email`, `password`, `phone_no`, `role`, `address`, `created_at`) VALUES
-(2, 'Abdullah Murshid', 'abdullahmurshid931@gmail.com', '0000', '0333-2615042', 'parent', 'House no. 55-A BL-2 karachi, Pakistan.', '2025-02-05 09:54:54'),
-(3, 'Mustafa', 'm@gmail.com', ' 123 ', '0334-5679086', 'parent', ' House no.632-C Tariq road BL-2, Karachi, Pakistan', '2025-01-21 08:14:14'),
-(4, 'abdul rehman', 'rsjutt7@gmail.com', 'ab12', '03273346757', 'parent', ' shah latif town karachi', '2025-01-21 08:22:40'),
-(5, 'aqsa noor', 'a@gmail.com', 'aa12', '0334-5679086', 'parent', ' korangi no # 2 1/2 house no # L-497 sector 48-B', '2025-01-21 08:33:39'),
-(6, 'jv', 'jv@gmail.com', ' jv123 ', '03315454', 'parent', ' sadsdwd', '2025-01-21 08:40:34'),
-(7, 'Mmk', 'mmk@gmail.com', '1234', '0333336554', 'parent', 'mmmk-BL-2', '2025-01-23 08:21:10');
+(2, 'Parent One', 'parent1@example.com', 'pass1', '0300-0000001', 'parent', 'House no. 1 Example Street, City A.', '2025-02-05 09:54:54'),
+(3, 'Parent Two', 'parent2@example.com', ' pass2 ', '0300-0000002', 'parent', ' House no.2 Example Street, City A', '2025-01-21 08:14:14'),
+(4, 'parent three', 'parent3@example.com', 'pass3', '03000000003', 'parent', ' example town city a', '2025-01-21 08:22:40'),
+(5, 'parent four', 'parent4@example.com', 'pass4', '0300-0000002', 'parent', ' example area # 4 house no # X-4 sector 4', '2025-01-21 08:33:39'),
+(6, 'p5', 'parent5@example.com', ' pass5 ', '03000005', 'parent', ' sadsdwd', '2025-01-21 08:40:34'),
+(7, 'P6', 'parent6@example.com', 'pass6', '0300000006', 'parent', 'example-6', '2025-01-23 08:21:10');
 
 -- --------------------------------------------------------
 
@@ -243,14 +243,14 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `role`, `full_name`, `phone`, `address`, `created_at`, `status`) VALUES
 (1, '$username', '$pass', '$email', 'admin', '', '$number', NULL, '2025-01-07 14:36:10', 'active'),
-(2, 'jawad', '123', 'jawadulbahar@gmail.com', 'admin', '', '03056456544', NULL, '2025-01-07 14:48:05', 'active'),
-(3, 'Abdul Rehman', '321', 'rsjutt@gmail.com', 'admin', '', '03133998235', NULL, '2025-01-07 14:51:38', 'active'),
-(4, 'Muslim', 'mus', 'muslim@gmail.com', 'admin', '', '03056456544', NULL, '2025-01-08 10:59:25', 'active'),
-(16, 'abdullah', '1234567', 'abdullah@gmail.com', '', '[value-6]', '03002110215', '[value-8]', '0000-00-00 00:00:00', ''),
-(17, 'ali', '223344', 'ali@gmail.com', '', '', '03192556707', '[value-8]', '0000-00-00 00:00:00', ''),
-(19, 'ayub', '$2y$10$5wktSi3V8M2RkDzU3tsqLewdfqGIFKJEtGWb4dDesQ.niW2.OPz8a', 'ayub@gmail.com', '', 'ayub', '0332456432', '', '2025-01-13 05:17:11', 'active'),
-(20, 'nawab', '$2y$10$WAUd8TfQdaMKooxcMfSMyOIez9FjA8a5.delPa09ucpbQjgqJxOw2', 'nawab@gmail.com', '', 'nawab', '123', '', '2025-01-13 05:20:02', 'active'),
-(21, 'ahmed', '12345', 'ahmed@gmail.com', '', '', '123456789', '[value-8]', '0000-00-00 00:00:00', '');
+(2, 'admin1', 'pass2', 'admin1@example.com', 'admin', '', '03000000102', NULL, '2025-01-07 14:48:05', 'active'),
+(3, 'Admin Two', 'pass3', 'admin2@example.com', 'admin', '', '03000000103', NULL, '2025-01-07 14:51:38', 'active'),
+(4, 'Admin3', 'pass4', 'admin3@example.com', 'admin', '', '03000000102', NULL, '2025-01-08 10:59:25', 'active'),
+(16, 'user16', 'pass16', 'user16@example.com', '', '[value-6]', '03000000116', '[value-8]', '0000-00-00 00:00:00', ''),
+(17, 'user17', 'pass17', 'user17@example.com', '', '', '03000000117', '[value-8]', '0000-00-00 00:00:00', ''),
+(19, 'user19', '$2y$10$5bcVGdjGXGRQGMeUYPN4r.Bzs97S4ZcbTbGC21.yEzH7ElVhhGtyi', 'user19@example.com', '', 'user19', '0300000119', '', '2025-01-13 05:17:11', 'active'),
+(20, 'user20', '$2y$10$.qOTncssLB3SgxjkT3Wyhu6KY8hWmtQHfYi5nJib5SlikrZQpqz/K', 'user20@example.com', '', 'user20', '123', '', '2025-01-13 05:20:02', 'active'),
+(21, 'user21', 'pass21', 'user21@example.com', '', '', '123456789', '[value-8]', '0000-00-00 00:00:00', '');
 
 -- --------------------------------------------------------
 
