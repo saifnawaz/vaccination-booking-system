@@ -24,6 +24,7 @@ class Navigation
             ],
             Role::Hospital => [
                 self::item('Overview', 'hospital.dashboard', 'hospital.dashboard', 'heroicon-o-home'),
+                self::item('Appointments', 'hospital.appointments.index', 'hospital.appointments.*', 'heroicon-o-clipboard-document-check'),
                 self::item('Stock', 'hospital.stock.index', 'hospital.stock.*', 'heroicon-o-archive-box'),
                 self::item('Time slots', 'hospital.slots.index', 'hospital.slots.*', 'heroicon-o-calendar-days'),
                 self::item('Hospital profile', 'hospital.profile.edit', 'hospital.profile.*', 'heroicon-o-building-office-2'),
@@ -31,6 +32,8 @@ class Navigation
             Role::Parent => [
                 self::item('Home', 'parent.dashboard', 'parent.dashboard', 'heroicon-o-home'),
                 self::item('Children', 'parent.children.index', 'parent.children.*', 'heroicon-o-heart'),
+                self::item('Book', 'parent.book', 'parent.book*', 'heroicon-o-plus-circle'),
+                self::item('Appointments', 'parent.appointments.index', 'parent.appointments.*', 'heroicon-o-calendar-days'),
                 self::item('Account', 'profile.edit', 'profile.*', 'heroicon-o-user-circle'),
             ],
         };

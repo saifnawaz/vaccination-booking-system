@@ -1,9 +1,13 @@
 <?php
 
+use App\Enums\AppointmentStatus;
+use App\Enums\DoseSource;
 use App\Enums\DoseStatus;
 use App\Enums\HospitalStatus;
 use App\Enums\Role;
+use App\Models\Appointment;
 use App\Models\Child;
+use App\Models\ChildDose;
 use App\Models\Hospital;
 use App\Models\HospitalStock;
 use App\Models\TimeSlot;
@@ -11,6 +15,7 @@ use App\Models\User;
 use App\Models\VaccineSchedule;
 use App\Services\StockSummary;
 use Database\Seeders\DatabaseSeeder;
+use Tests\Support\BookingWorld;
 
 beforeEach(function () {
     $this->seed(DatabaseSeeder::class);
@@ -38,8 +43,8 @@ test('the seeded admin can log in and the inactive hospital cannot', function ()
     $this->assertGuest();
 });
 
-test('about 20 children are seeded, each with a full schedule', function () {
-    expect(Child::count())->toBe(20);
+test('about 20 children (21) are seeded, each with a full schedule', function () {
+    expect(Child::count())->toBe(21);
 
     Child::all()->each(fn (Child $child) => expect($child->doses()->count())->toBe(VaccineSchedule::count()));
 });
@@ -70,9 +75,25 @@ test('seeded doses only use batches that had not expired', function () {
         ->each(fn ($dose) => expect($dose->hospitalStock->expiry_date->gte($dose->administered_at))->toBeTrue());
 });
 
-test('active hospitals have upcoming slots and none are in the past', function () {
+test('active hospitals have upcoming slots, and past slots only hold finished visits', function () {
     Hospital::where('status', HospitalStatus::Active)->get()
-        ->each(fn (Hospital $hospital) => expect($hospital->timeSlots()->count())->toBeGreaterThan(0));
+        ->each(fn (Hospital $hospital) => expect($hospital->timeSlots()->whereDate('date', '>=', today())->count())->toBeGreaterThan(0));
 
-    expect(TimeSlot::whereDate('date', '<', today())->count())->toBe(0);
+    $past = TimeSlot::whereDate('date', '<', today())->get();
+    $past->each(fn (TimeSlot $slot) => expect($slot->appointments()->count())->toBeGreaterThan(0)
+        ->and($slot->appointments()->open()->count())->toBe(0));
+});
+
+test('seeded appointments cover every status and keep stock consistent', function () {
+    foreach (AppointmentStatus::cases() as $status) {
+        expect(Appointment::where('status', $status)->exists())->toBeTrue("No seeded appointment is {$status->value}");
+    }
+
+    expect(BookingWorld::reservationsAreConsistent())->toBeTrue();
+});
+
+test('some seeded doses are historical records', function () {
+    expect(ChildDose::where('source', DoseSource::HistoricalRecord)->count())->toBeGreaterThan(0)
+        ->and(ChildDose::where('source', DoseSource::HistoricalRecord)->whereNotNull('hospital_stock_id')->count())->toBe(0)
+        ->and(ChildDose::whereNotNull('administered_at')->whereNull('source')->count())->toBe(0);
 });

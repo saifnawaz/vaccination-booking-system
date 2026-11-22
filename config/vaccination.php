@@ -30,6 +30,11 @@ return [
         'expiring_soon_days' => 30,
     ],
 
+    'booking' => [
+        // Parents can cancel or reschedule until this many hours before the slot starts.
+        'change_cutoff_hours' => 24,
+    ],
+
     'slots' => [
         // Bulk creation: longest date range and most slots per request.
         'bulk_max_range_days' => 62,

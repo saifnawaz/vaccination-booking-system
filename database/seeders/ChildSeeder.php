@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\DoseSource;
 use App\Enums\Gender;
 use App\Enums\HospitalStatus;
 use App\Enums\Role;
@@ -15,7 +16,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 
 /**
- * 20 children of varied ages with realistic vaccination histories, so that every
+ * 21 children of varied ages with realistic vaccination histories, so that every
  * schedule state appears: completed, due, upcoming, overdue and missed.
  * Names are invented. Ages are relative to the day the seeder runs.
  *
@@ -53,10 +54,17 @@ class ChildSeeder extends Seeder
         [4, 'Zara', 'Tariq', 'female', 183, 98, ['Rota-1', 'Rota-2'], 2],        // Rota-1 missed, so Rota-2 missed too
         [10, 'Esha', 'Farooq', 'female', 140, 0, [], 1],                         // nothing since birth: Rota missed, rest overdue
 
-        // Fully vaccinated.
+        // Fully vaccinated. Bilal's doses were all copied from his old vaccination card.
         [1, 'Maryam', 'Khan', 'female', 760, 450, [], 2],
         [7, 'Bilal', 'Qureshi', 'male', 1100, 450, [], 3],
+
+        // Catch-up: two years old with nothing since birth. Age-limited doses are missed,
+        // everything else is overdue and still bookable.
+        [2, 'Danyal', 'Ahmed', 'male', 730, 0, [], 1],
     ];
+
+    /** Children whose doses were entered from previous records rather than given here. */
+    private const HISTORICAL = ['Bilal'];
 
     public function run(ScheduleGenerator $generator): void
     {
@@ -82,9 +90,21 @@ class ChildSeeder extends Seeder
             $child->doses()->with('scheduleDose')->get()
                 ->filter(fn (ChildDose $dose) => $dose->scheduleDose->age_days <= $givenUpTo)
                 ->reject(fn (ChildDose $dose) => in_array($dose->scheduleDose->label, $skip, true))
-                ->each(function (ChildDose $dose) use ($daysLate, $batches) {
+                ->each(function (ChildDose $dose) use ($daysLate, $batches, $first) {
                     $dose->administered_at = $dose->due_date->addDays($daysLate);
-                    $dose->hospital_stock_id = $batches->get($dose->scheduleDose->vaccine_id)?->id;
+
+                    if (in_array($first, self::HISTORICAL, true)) {
+                        $dose->source = DoseSource::HistoricalRecord;
+                        $dose->administered_by_hospital_id = $batches->first()->hospital_id;
+                        $dose->batch_number = 'CARD-'.strtoupper(substr($dose->scheduleDose->label, 0, 4)).'-'.$dose->id;
+                    } else {
+                        $batch = $batches->get($dose->scheduleDose->vaccine_id);
+                        $dose->source = DoseSource::GivenHere;
+                        $dose->hospital_stock_id = $batch?->id;
+                        $dose->batch_number = $batch?->batch_number;
+                        $dose->administered_by_hospital_id = $batch?->hospital_id;
+                    }
+
                     $dose->save();
                 });
         }

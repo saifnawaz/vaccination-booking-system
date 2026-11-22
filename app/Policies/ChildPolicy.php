@@ -35,6 +35,14 @@ class ChildPolicy
         return $this->owns($user, $child);
     }
 
+    /**
+     * Book appointments for this child.
+     */
+    public function book(User $user, Child $child): bool
+    {
+        return $this->owns($user, $child);
+    }
+
     private function owns(User $user, Child $child): bool
     {
         return $user->isParent() && $child->parent_id === $user->id;

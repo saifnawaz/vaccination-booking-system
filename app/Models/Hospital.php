@@ -65,6 +65,14 @@ class Hospital extends Model
     }
 
     /**
+     * @return HasMany<Appointment, $this>
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
      * @param  Builder<self>  $query
      */
     public function scopeActive(Builder $query): void

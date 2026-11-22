@@ -47,23 +47,29 @@
                             <li class="flex items-center justify-between gap-3 rounded-xl bg-surface px-4 py-3 ring-1 ring-line">
                                 <div>
                                     <p class="font-medium text-ink">{{ $slot->timeRange() }}</p>
-                                    <p class="text-sm text-ink-muted">{{ $slot->capacity }} {{ str('child')->plural($slot->capacity) }} per slot</p>
+                                    <p class="text-sm {{ $slot->booked_children >= $slot->capacity ? 'font-semibold text-accent-700' : 'text-ink-muted' }}">
+                                        {{ $slot->booked_children }} of {{ $slot->capacity }} booked{{ $slot->booked_children >= $slot->capacity ? ' · full' : '' }}
+                                    </p>
                                 </div>
                                 <div class="flex gap-1">
                                     <x-button :href="route('hospital.slots.edit', $slot)" variant="ghost" size="sm">
                                         <x-heroicon-o-pencil-square class="size-4" aria-hidden="true" />
                                         <span class="sr-only">Change capacity for {{ $day->format('j M') }}, {{ $slot->timeRange() }}</span>
                                     </x-button>
-                                    <x-button type="button" variant="ghost" size="sm" class="text-danger-700 hover:bg-danger-50"
-                                              x-data x-on:click="$dispatch('open-modal', 'remove-slot-{{ $slot->id }}')">
-                                        <x-heroicon-o-trash class="size-4" aria-hidden="true" />
-                                        <span class="sr-only">Remove {{ $day->format('j M') }}, {{ $slot->timeRange() }}</span>
-                                    </x-button>
+                                    @if ($slot->booked_children === 0)
+                                        <x-button type="button" variant="ghost" size="sm" class="text-danger-700 hover:bg-danger-50"
+                                                  x-data x-on:click="$dispatch('open-modal', 'remove-slot-{{ $slot->id }}')">
+                                            <x-heroicon-o-trash class="size-4" aria-hidden="true" />
+                                            <span class="sr-only">Remove {{ $day->format('j M') }}, {{ $slot->timeRange() }}</span>
+                                        </x-button>
+                                    @endif
                                 </div>
-                                <x-confirm-dialog :name="'remove-slot-'.$slot->id" title="Remove this slot?"
-                                                  :action="route('hospital.slots.destroy', $slot)" method="DELETE" confirm-label="Remove slot">
-                                    {{ $day->format('l j F') }}, {{ $slot->timeRange() }} will no longer be offered to parents.
-                                </x-confirm-dialog>
+                                @if ($slot->booked_children === 0)
+                                    <x-confirm-dialog :name="'remove-slot-'.$slot->id" title="Remove this slot?"
+                                                      :action="route('hospital.slots.destroy', $slot)" method="DELETE" confirm-label="Remove slot">
+                                        {{ $day->format('l j F') }}, {{ $slot->timeRange() }} will no longer be offered to parents.
+                                    </x-confirm-dialog>
+                                @endif
                             </li>
                         @endforeach
                     </ul>
