@@ -1,4 +1,3 @@
-<?php require_once 'auth.php'; require_role('admin'); ?>
 <?php include('connection.php'); ?>
 <!DOCTYPE html>
 <html lang="en">

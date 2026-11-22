@@ -1,9 +1,8 @@
-<?php require_once 'auth.php'; require_role('admin'); ?>
 <?php 
 include('connection.php');
 
-if (isset($_POST['delete_id'])) {
-    $id = $_POST['delete_id'];
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
     $del = mysqli_query($conn, "DELETE FROM `vaccines` WHERE id=$id");
     if ($del) {
         echo "<script>alert('Data deleted'); location.assign('view-vaccine.php');</script>";
@@ -122,12 +121,9 @@ if (isset($_POST['delete_id'])) {
                                     <a href="update_vacc.php?Uid=<?php echo $data['id']; ?>" class="btn btn-info btn-sm btn-action">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <form method="post" action="" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                                        <input type="hidden" name="delete_id" value="<?php echo $data['id']; ?>">
-                                        <button type="submit" class="btn btn-primary btn-sm btn-action">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </form>
+                                    <a href="?id=<?php echo $data['id']; ?>" class="btn btn-primary btn-sm btn-action" onclick="return confirm('Are you sure you want to delete this item?');">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
                                 </td>
                     </tr>
                     <?php } ?>
