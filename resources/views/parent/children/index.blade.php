@@ -8,7 +8,7 @@
     </x-page-header>
 
     @if ($total > 3)
-        <form method="GET" action="{{ route('parent.children.index') }}" data-no-loading class="mb-6 flex gap-2">
+        <form method="GET" action="{{ route('parent.children.index') }}" data-no-loading data-filter class="mb-6 flex gap-2">
             <x-input-label for="search" value="Search children" class="sr-only" />
             <x-text-input id="search" name="search" type="search" :value="$search" placeholder="Child's name" class="max-w-sm" />
             <x-button variant="secondary">Search</x-button>
@@ -18,6 +18,7 @@
         </form>
     @endif
 
+    <x-list-region layout="cards">
     @if ($total === 0)
         <x-empty-state title="No children added yet" icon="heroicon-o-heart">
             Add a child with their date of birth and we'll build their full vaccination schedule.
@@ -41,4 +42,5 @@
 
         <div class="mt-6">{{ $children->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

@@ -26,16 +26,29 @@ enum DoseStatus: string
     }
 
     /**
-     * <x-badge> tone: green completed, amber due, red overdue.
+     * <x-badge> tone: completed green, due and upcoming mustard, overdue red, missed grey.
      */
     public function tone(): string
     {
         return match ($this) {
             self::Completed => 'success',
-            self::Due => 'warning',
+            self::Due, self::Upcoming => 'warning',
             self::Overdue => 'danger',
-            self::Upcoming => 'primary',
             self::Missed => 'neutral',
+        };
+    }
+
+    /**
+     * Shown next to the label, so the status never relies on colour alone.
+     */
+    public function icon(): string
+    {
+        return match ($this) {
+            self::Completed => 'heroicon-o-check-circle',
+            self::Due => 'heroicon-o-bell',
+            self::Upcoming => 'heroicon-o-clock',
+            self::Overdue => 'heroicon-o-exclamation-circle',
+            self::Missed => 'heroicon-o-minus-circle',
         };
     }
 

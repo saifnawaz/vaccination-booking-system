@@ -1,8 +1,10 @@
 {{--
     Status pill. Tones map to the theme's status colours:
-    success (completed/active), warning (due/pending), danger (overdue), accent, primary, neutral.
+    success (completed/active), warning (due/upcoming/pending, mustard), danger (overdue
+    and errors only), primary, neutral (missed/inactive), accent.
+    Pass `icon` so status never relies on colour alone; without one a dot is shown.
 --}}
-@props(['tone' => 'neutral'])
+@props(['tone' => 'neutral', 'icon' => null])
 
 @php
     $tones = [
@@ -15,15 +17,19 @@
     ];
     $dots = [
         'neutral' => 'bg-ink-subtle',
-        'primary' => 'bg-primary-500',
+        'primary' => 'bg-primary-600',
         'success' => 'bg-success-500',
-        'warning' => 'bg-warning-500',
+        'warning' => 'bg-warning-400',
         'danger' => 'bg-danger-500',
-        'accent' => 'bg-accent-500',
+        'accent' => 'bg-accent-400',
     ];
 @endphp
 
 <span {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset '.$tones[$tone]]) }}>
-    <span class="size-1.5 rounded-full {{ $dots[$tone] }}" aria-hidden="true"></span>
+    @if ($icon)
+        <x-dynamic-component :component="$icon" class="-ms-0.5 size-3.5 shrink-0" aria-hidden="true" />
+    @else
+        <span class="size-1.5 rounded-full {{ $dots[$tone] }}" aria-hidden="true"></span>
+    @endif
     {{ $slot }}
 </span>

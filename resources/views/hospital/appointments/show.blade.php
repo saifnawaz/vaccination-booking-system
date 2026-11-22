@@ -18,7 +18,7 @@
             <x-card>
                 <div class="flex items-start justify-between gap-4">
                     <h2 class="text-base font-semibold text-ink">This appointment</h2>
-                    <x-badge :tone="$appointment->status->tone()">{{ $appointment->status->label() }}</x-badge>
+                    <x-status :status="$appointment->status" />
                 </div>
                 <dl class="mt-4 grid gap-4 text-sm sm:grid-cols-2">
                     <div>
@@ -37,7 +37,7 @@
                             <dd class="mt-1 flex flex-wrap gap-2">
                                 @foreach ($visit as $other)
                                     <a href="{{ route('hospital.appointments.show', $other) }}">
-                                        <x-badge :tone="$other->status->tone()">{{ $other->doseLabel() }}: {{ $other->status->label() }}</x-badge>
+                                        <x-badge :tone="$other->status->tone()" :icon="$other->status->icon()">{{ $other->doseLabel() }}: {{ $other->status->label() }}</x-badge>
                                     </a>
                                 @endforeach
                             </dd>

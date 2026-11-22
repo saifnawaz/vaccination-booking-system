@@ -4,8 +4,8 @@
     <x-page-header title="Appointments"
                    :description="$pendingCount > 0 ? $pendingCount.' '.str('booking')->plural($pendingCount).' waiting for you to confirm.' : 'Bookings parents have made with you.'" />
 
-    <form method="GET" action="{{ route('hospital.appointments.index') }}" data-no-loading
-          class="mb-6 flex flex-col gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line sm:flex-row sm:items-end">
+    <form method="GET" action="{{ route('hospital.appointments.index') }}" data-no-loading data-filter
+          class="mb-6 flex flex-col gap-3 rounded-2xl bg-card p-4 ring-1 ring-line sm:flex-row sm:items-end">
         <div class="flex-1">
             <x-input-label for="search" value="Child's name" />
             <x-text-input id="search" name="search" type="search" :value="$filters['search'] ?? ''" class="mt-1.5" />
@@ -29,6 +29,7 @@
         </div>
     </form>
 
+    <x-list-region :rows="8">
     @if ($appointments->isEmpty())
         <x-empty-state title="No appointments here" icon="heroicon-o-clipboard-document-check">
             @if ($filters['status'] === 'open' && empty($filters['search']) && empty($filters['date']))
@@ -40,7 +41,7 @@
     @else
         <x-card :padding="false" class="overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-line text-sm">
+                <table class="table-stack min-w-full divide-y divide-line text-sm">
                     <caption class="sr-only">Appointments</caption>
                     <thead class="bg-surface-muted">
                         <tr>
@@ -54,24 +55,24 @@
                     <tbody class="divide-y divide-line">
                         @foreach ($appointments as $appointment)
                             <tr class="align-top hover:bg-canvas">
-                                <td class="px-5 py-4">
+                                <td data-label="When" class="px-5 py-4">
                                     <p class="font-semibold text-ink">{{ $appointment->timeSlot->date->format('D j M') }}</p>
                                     <p class="text-ink-muted">{{ $appointment->timeSlot->timeRange() }}</p>
                                 </td>
-                                <td class="px-5 py-4">
+                                <td data-label="Child" class="px-5 py-4">
                                     <a href="{{ route('hospital.appointments.show', $appointment) }}" class="font-semibold text-ink hover:text-primary-700 hover:underline">
                                         {{ $appointment->child->fullName() }}
                                     </a>
                                     <p class="text-ink-muted">{{ $appointment->child->ageLabel() }} old</p>
                                 </td>
-                                <td class="px-5 py-4">
+                                <td data-label="Vaccine" class="px-5 py-4">
                                     <p class="font-medium text-ink">{{ $appointment->doseLabel() }}</p>
                                     <p class="font-mono text-xs text-ink-muted">Batch {{ $appointment->hospitalStock->batch_number }}</p>
                                 </td>
-                                <td class="px-5 py-4">
-                                    <x-badge :tone="$appointment->status->tone()">{{ $appointment->status->label() }}</x-badge>
+                                <td data-label="Status" class="px-5 py-4">
+                                    <x-status :status="$appointment->status" />
                                 </td>
-                                <td class="px-5 py-4">
+                                <td data-label="" class="px-5 py-4">
                                     @include('hospital.appointments.partials.actions', ['appointment' => $appointment])
                                 </td>
                             </tr>
@@ -83,4 +84,5 @@
 
         <div class="mt-6">{{ $appointments->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

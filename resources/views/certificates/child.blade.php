@@ -15,30 +15,36 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Vaccination certificate · {{ $child->fullName() }} · {{ config('app.name') }}</title>
     <style>
         @page { margin: 18mm 16mm; }
         * { box-sizing: border-box; }
-        body { font-family: DejaVu Sans, Helvetica, Arial, sans-serif; color: #1d2a29; font-size: 11pt; line-height: 1.45; margin: 0; background: #fff; }
-        .sheet { max-width: 800px; margin: 0 auto; padding: 24px; }
+        body { font-family: DejaVu Sans, Helvetica, Arial, sans-serif; color: #16261e; font-size: 11pt; line-height: 1.45; margin: 0; background: #fff; }
+        .sheet { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+        @media (max-width: 600px) { table.doses th:nth-child(4), table.doses td:nth-child(4) { display: none; } .toolbar { flex-wrap: wrap; } }
         .toolbar { max-width: 800px; margin: 16px auto 0; padding: 0 24px; display: flex; gap: 8px; }
-        .toolbar a, .toolbar button { font: inherit; font-size: 10pt; font-weight: bold; padding: 8px 14px; border-radius: 8px; border: 1px solid #8c8273; background: #fff; color: #1d2a29; text-decoration: none; cursor: pointer; }
-        .toolbar .primary { background: #1b5b56; border-color: #1b5b56; color: #fff; }
-        header { border-bottom: 3px solid #1b5b56; padding-bottom: 12px; margin-bottom: 18px; }
-        .brand { font-size: 10pt; font-weight: bold; color: #1b5b56; letter-spacing: 0.04em; text-transform: uppercase; }
+        .toolbar a, .toolbar button { font: inherit; font-size: 10pt; font-weight: bold; padding: 8px 14px; border-radius: 8px; border: 1px solid #6f8272; background: #fff; color: #16261e; text-decoration: none; cursor: pointer; }
+        .toolbar .primary { background: #1a754d; border-color: #1a754d; color: #fff; }
+        header { border-bottom: 3px solid #1f8a5b; padding-bottom: 12px; margin-bottom: 18px; }
+        .brand { display: table; }
+        .brand-mark, .brand-text { display: table-cell; vertical-align: middle; }
+        .brand-mark { width: 44px; padding-right: 10px; }
+        .brand-name { font-size: 16pt; font-weight: bold; color: #0f3d2e; }
+        .brand-tagline { font-size: 9pt; color: #46574d; }
         h1 { font-size: 20pt; margin: 4px 0 0; }
-        h2 { font-size: 12pt; margin: 22px 0 8px; color: #1b5b56; }
+        h2 { font-size: 12pt; margin: 22px 0 8px; color: #0f3d2e; }
         .details { width: 100%; border-collapse: collapse; }
         .details td { padding: 3px 12px 3px 0; vertical-align: top; }
-        .details td.label { color: #56625f; width: 130px; }
+        .details td.label { color: #46574d; width: 130px; }
         table.doses { width: 100%; border-collapse: collapse; font-size: 10pt; }
-        table.doses th { text-align: left; background: #f4efe7; color: #1d2a29; padding: 7px 8px; border-bottom: 1px solid #cfc5b6; }
-        table.doses td { padding: 7px 8px; border-bottom: 1px solid #e6dfd4; vertical-align: top; }
+        table.doses th { text-align: left; background: #e3ebdd; color: #16261e; padding: 7px 8px; border-bottom: 1px solid #c0ceb7; }
+        table.doses td { padding: 7px 8px; border-bottom: 1px solid #d8e2d1; vertical-align: top; }
         .mono { font-family: DejaVu Sans Mono, monospace; font-size: 9pt; }
-        .note { display: inline-block; margin-top: 2px; font-size: 8.5pt; color: #7a5205; background: #fdf5e1; border: 1px solid #faeac2; border-radius: 4px; padding: 1px 5px; }
-        .muted { color: #56625f; }
+        .note { display: inline-block; margin-top: 2px; font-size: 8.5pt; color: #6a5416; background: #fbf3dc; border: 1px solid #f5e3ae; border-radius: 4px; padding: 1px 5px; }
+        .muted { color: #46574d; }
         .list { margin: 0; padding-left: 18px; }
-        footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #e6dfd4; font-size: 8.5pt; color: #56625f; }
+        footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #d8e2d1; font-size: 8.5pt; color: #46574d; }
         @media print { .toolbar { display: none; } .sheet { padding: 0; } }
     </style>
 </head>
@@ -53,7 +59,19 @@
 
     <div class="sheet">
         <header>
-            <div class="brand">{{ config('app.name') }}</div>
+            <div class="brand">
+                <div class="brand-mark">
+                    @if ($pdf ?? false)
+                        <img src="{{ public_path('favicon.svg') }}" width="44" height="44" alt="">
+                    @else
+                        <x-logo size="44" />
+                    @endif
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">{{ config('app.name') }}</div>
+                    <div class="brand-tagline">{{ config('app.tagline') }}</div>
+                </div>
+            </div>
             <h1>Vaccination certificate</h1>
         </header>
 

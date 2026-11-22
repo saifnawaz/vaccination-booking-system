@@ -10,13 +10,14 @@
         'accent' => 'bg-accent-50 text-accent-700',
         'success' => 'bg-success-50 text-success-700',
         'neutral' => 'bg-surface-muted text-ink-muted',
+        'danger' => 'bg-danger-50 text-danger-700',
     ];
     $tag = $href ? 'a' : 'div';
 @endphp
 
 <{{ $tag }}
     @if ($href) href="{{ $href }}" @endif
-    {{ $attributes->merge(['class' => 'flex items-center gap-4 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line'.($href ? ' transition hover:ring-primary-300' : '')]) }}
+    {{ $attributes->merge(['class' => 'flex items-center gap-4 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line'.($href ? ' transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:ring-primary-300' : '')]) }}
 >
     <span class="flex size-11 shrink-0 items-center justify-center rounded-xl {{ $iconTones[$tone] }}">
         <x-dynamic-component :component="$icon" class="size-6" aria-hidden="true" />

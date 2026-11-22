@@ -7,12 +7,13 @@
         </x-slot:actions>
     </x-page-header>
 
-    <form method="GET" action="{{ route('admin.admins.index') }}" data-no-loading class="mb-6 flex gap-2">
+    <form method="GET" action="{{ route('admin.admins.index') }}" data-no-loading data-filter class="mb-6 flex gap-2">
         <x-input-label for="search" value="Search administrators" class="sr-only" />
         <x-text-input id="search" name="search" type="search" :value="$search" placeholder="Name or email" class="max-w-sm" />
         <x-button variant="secondary">Search</x-button>
     </form>
 
+    <x-list-region :rows="3">
     @if ($admins->isEmpty())
         <x-empty-state title="No administrators match" icon="heroicon-o-magnifying-glass">
             Try a different name or email.
@@ -39,4 +40,5 @@
 
         <div class="mt-6">{{ $admins->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

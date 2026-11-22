@@ -26,7 +26,7 @@
     $fmt = fn ($v) => number_format($v).($unit ? ' '.str($unit)->plural($v) : '');
 @endphp
 
-<figure {{ $attributes->merge(['class' => 'rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line']) }} aria-labelledby="{{ $id }}-title">
+<figure {{ $attributes->merge(['class' => 'rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line']) }} aria-labelledby="{{ $id }}-title">
     <figcaption>
         <h3 id="{{ $id }}-title" class="text-base font-semibold text-ink">{{ $title }}</h3>
         @if ($description)

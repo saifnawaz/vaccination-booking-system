@@ -31,7 +31,7 @@
         <div class="space-y-6">
             <x-card>
                 <h2 class="text-base font-semibold text-ink">Status</h2>
-                <x-badge :tone="$hospital->status->tone()" class="mt-3">{{ $hospital->status->label() }}</x-badge>
+                <x-status :status="$hospital->status" class="mt-3" />
                 <dl class="mt-4 space-y-3 text-sm">
                     <div>
                         <dt class="font-medium text-ink-muted">Registered</dt>

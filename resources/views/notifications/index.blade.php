@@ -12,16 +12,17 @@
 
     <nav aria-label="Filter notifications" class="mb-4 flex gap-2">
         @foreach (['all' => 'All', 'unread' => 'Unread'] as $value => $label)
-            <a href="{{ route('notifications.index', $value === 'all' ? [] : ['show' => $value]) }}"
+            <a href="{{ route('notifications.index', $value === 'all' ? [] : ['show' => $value]) }}" data-filter-link
                @if ($filter === $value) aria-current="page" @endif
                @class([
-                   'rounded-full px-4 py-1.5 text-sm font-semibold transition-colors',
+                   'rounded-full px-4 py-1.5 text-sm font-semibold transition-colors duration-200 ease-out',
                    'bg-primary-700 text-white' => $filter === $value,
                    'bg-surface text-ink ring-1 ring-line-input hover:bg-surface-muted' => $filter !== $value,
                ])>{{ $label }}</a>
         @endforeach
     </nav>
 
+    <x-list-region>
     @if ($notifications->isEmpty())
         <x-empty-state :title="$filter === 'unread' ? 'No unread notifications' : 'No notifications yet'" icon="heroicon-o-bell">
             Booking updates and vaccination reminders will appear here.
@@ -55,4 +56,5 @@
 
         <div class="mt-6">{{ $notifications->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

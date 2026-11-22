@@ -1,8 +1,8 @@
 <x-app-layout title="Activity log">
     <x-page-header title="Activity log" description="Who approved, declined, cancelled, changed or deleted what." />
 
-    <form method="GET" action="{{ route('admin.activity.index') }}" data-no-loading
-          class="mb-6 grid gap-3 rounded-2xl bg-surface p-4 ring-1 ring-line sm:grid-cols-2 lg:grid-cols-[1fr_12rem_10rem_10rem_auto] lg:items-end">
+    <form method="GET" action="{{ route('admin.activity.index') }}" data-no-loading data-filter
+          class="mb-6 grid gap-3 rounded-2xl bg-card p-4 ring-1 ring-line sm:grid-cols-2 lg:grid-cols-[1fr_12rem_10rem_10rem_auto] lg:items-end">
         <div>
             <x-input-label for="search" value="Search" />
             <x-text-input id="search" name="search" type="search" :value="$filters['search'] ?? ''" placeholder="Name, hospital, child…" class="mt-1.5" />
@@ -32,6 +32,7 @@
         </div>
     </form>
 
+    <x-list-region :rows="8">
     @if ($entries->isEmpty())
         <x-empty-state :title="array_filter($filters) ? 'Nothing matches' : 'No activity yet'" icon="heroicon-o-clipboard-document-check">
             {{ array_filter($filters) ? 'Try a different search or date range.' : 'Approvals, cancellations and deletions will appear here.' }}
@@ -39,7 +40,7 @@
     @else
         <x-card :padding="false" class="overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-line text-sm">
+                <table class="table-stack min-w-full divide-y divide-line text-sm">
                     <caption class="sr-only">Activity log</caption>
                     <thead class="bg-surface-muted">
                         <tr>
@@ -51,11 +52,11 @@
                     <tbody class="divide-y divide-line">
                         @foreach ($entries as $entry)
                             <tr class="align-top">
-                                <td class="whitespace-nowrap px-5 py-3">
+                                <td data-label="When" class="whitespace-nowrap px-5 py-3">
                                     <p class="text-ink">{{ $entry->created_at->format('j M Y') }}</p>
                                     <p class="text-ink-muted">{{ $entry->created_at->format('g:i a') }}</p>
                                 </td>
-                                <td class="px-5 py-3">
+                                <td data-label="Who" class="px-5 py-3">
                                     @if ($entry->causer)
                                         <p class="font-medium text-ink">{{ $entry->causer->name }}</p>
                                         <p class="text-ink-muted">{{ $entry->causer->role->label() }}</p>
@@ -64,7 +65,7 @@
                                         <p class="text-ink-muted">Automatic</p>
                                     @endif
                                 </td>
-                                <td class="px-5 py-3">
+                                <td data-label="What" class="px-5 py-3">
                                     <x-badge tone="neutral">{{ $areas[$entry->area()] ?? ucfirst($entry->area()) }}</x-badge>
                                     <p class="mt-1 text-ink">{{ $entry->description }}</p>
                                     @if (! empty($entry->properties['reason']))
@@ -80,4 +81,5 @@
 
         <div class="mt-6">{{ $entries->links() }}</div>
     @endif
+    </x-list-region>
 </x-app-layout>

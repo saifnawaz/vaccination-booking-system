@@ -13,7 +13,7 @@
             @foreach ($children as ['child' => $child, 'bookable' => $bookable])
                 <li>
                     <a href="{{ route('parent.book.doses', $child) }}"
-                       class="flex items-center justify-between gap-3 rounded-2xl bg-surface p-5 shadow-sm ring-1 ring-line transition hover:ring-primary-300">
+                       class="flex items-center justify-between gap-3 rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md hover:ring-primary-300">
                         <span class="min-w-0">
                             <span class="block font-semibold text-ink">{{ $child->fullName() }}</span>
                             <span class="block text-sm text-ink-muted">{{ $child->ageLabel() }} old</span>

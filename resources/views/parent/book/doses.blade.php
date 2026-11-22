@@ -17,7 +17,7 @@
             </x-slot:actions>
         </x-empty-state>
     @else
-        <form method="GET" action="{{ route('parent.book.hospitals', $child) }}" data-no-loading class="space-y-6">
+        <form method="GET" action="{{ route('parent.book.hospitals', $child) }}" data-no-loading data-filter class="space-y-6">
             <fieldset>
                 <legend class="text-lg font-semibold text-ink">Which vaccines?</legend>
                 <p class="mt-1 text-sm text-ink-muted">Vaccines due at the same age are usually given in one visit. Choose all you'd like to book together.</p>
@@ -43,7 +43,7 @@
                                     <span class="min-w-0 flex-1">
                                         <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
                                             <span class="font-semibold text-ink">{{ $dose->label() }}</span>
-                                            <x-badge :tone="$dose->status->tone()">{{ $dose->status->label() }}</x-badge>
+                                            <x-status :status="$dose->status" />
                                         </span>
                                         <span class="mt-0.5 block text-sm text-ink-muted">{{ $dose->schedule()->vaccine->name }}</span>
                                         <span class="mt-1 block text-sm text-ink">{{ $dose->summary() }}</span>
