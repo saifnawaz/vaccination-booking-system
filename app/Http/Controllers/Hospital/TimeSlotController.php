@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BulkTimeSlotRequest;
 use App\Http\Requests\TimeSlotRequest;
 use App\Models\TimeSlot;
+use App\Services\ActivityLogger;
 use App\Services\SlotGenerator;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
@@ -154,6 +155,7 @@ class TimeSlotController extends Controller
         }
 
         $slot->delete();
+        app(ActivityLogger::class)->log('slot.removed', 'Removed slot '.$slot->date->format('j M Y').', '.$slot->timeRange()." at {$slot->hospital->name}", $slot);
 
         return back()->with('success', 'Slot on '.$slot->date->format('D j M').', '.$slot->timeRange().' has been removed.');
     }

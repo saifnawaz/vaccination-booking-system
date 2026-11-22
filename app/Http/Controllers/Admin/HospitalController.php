@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\HospitalStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Hospital;
+use App\Services\ActivityLogger;
+use App\Services\AppointmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -75,12 +77,18 @@ class HospitalController extends Controller
         DB::transaction(function () use ($hospital) {
             $hospital->delete();
             $hospital->user->delete();
+            app(ActivityLogger::class)->log('hospital.deleted', "Deleted {$hospital->name}", $hospital);
         });
 
         return redirect()->route('admin.hospitals.index')->with('success', "{$hospital->name} has been deleted.");
     }
 
-    public function updateStatus(Request $request, Hospital $hospital): RedirectResponse
+    /**
+     * Approve, decline, deactivate or reactivate. Moving a hospital to inactive also
+     * cancels its open appointments (releasing their doses and telling the parents),
+     * all in one transaction.
+     */
+    public function updateStatus(Request $request, Hospital $hospital, AppointmentService $appointments, ActivityLogger $activity): RedirectResponse
     {
         Gate::authorize('changeStatus', $hospital);
 
@@ -97,8 +105,23 @@ class HospitalController extends Controller
             ]);
         }
 
-        $hospital->transitionTo($next, $request->user());
+        $done = $previous->actionDoneLabel($next);
 
-        return back()->with('success', "{$hospital->name} has been {$previous->actionDoneLabel($next)}.");
+        $cancelled = DB::transaction(function () use ($hospital, $next, $previous, $done, $request, $appointments, $activity) {
+            $hospital->transitionTo($next, $request->user());
+            $cancelled = $next === HospitalStatus::Inactive ? $appointments->cancelOpenForHospital($hospital) : 0;
+
+            $activity->log(
+                "hospital.{$done}",
+                ucfirst($done)." {$hospital->name}".($cancelled ? " and cancelled {$cancelled} open ".str('appointment')->plural($cancelled) : ''),
+                $hospital,
+                array_filter(['from' => $previous->value, 'to' => $next->value, 'appointments_cancelled' => $cancelled]),
+            );
+
+            return $cancelled;
+        });
+
+        return back()->with('success', "{$hospital->name} has been {$done}."
+            .($cancelled ? " {$cancelled} open ".str('appointment')->plural($cancelled).' were cancelled and the parents notified.' : ''));
     }
 }

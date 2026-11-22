@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\VaccineRequest;
 use App\Models\Vaccine;
 use App\Models\VaccineSchedule;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -47,6 +48,7 @@ class VaccineController extends Controller
         Gate::authorize('create', Vaccine::class);
 
         $vaccine = Vaccine::create($request->validated());
+        app(ActivityLogger::class)->log('vaccine.created', "Added {$vaccine->name} ({$vaccine->code}) to the catalog", $vaccine);
 
         return redirect()->route('admin.vaccines.index')->with('success', "{$vaccine->name} has been added to the catalog.");
     }
@@ -64,7 +66,18 @@ class VaccineController extends Controller
     {
         Gate::authorize('update', $vaccine);
 
-        $vaccine->update($request->validated());
+        $vaccine->fill($request->validated());
+        $changes = $vaccine->getDirty();
+        $vaccine->save();
+
+        if ($changes) {
+            app(ActivityLogger::class)->log(
+                array_key_exists('is_active', $changes) ? ($vaccine->is_active ? 'vaccine.activated' : 'vaccine.deactivated') : 'vaccine.updated',
+                (array_key_exists('is_active', $changes) ? ($vaccine->is_active ? 'Activated ' : 'Deactivated ') : 'Updated ').$vaccine->name,
+                $vaccine,
+                ['changed' => array_keys($changes)],
+            );
+        }
 
         return redirect()->route('admin.vaccines.index')->with('success', "{$vaccine->name} has been saved.");
     }
@@ -80,6 +93,7 @@ class VaccineController extends Controller
         Gate::authorize('delete', $vaccine);
 
         $vaccine->delete();
+        app(ActivityLogger::class)->log('vaccine.deleted', "Deleted {$vaccine->name} ({$vaccine->code})", $vaccine);
 
         return redirect()->route('admin.vaccines.index')->with('success', "{$vaccine->name} has been deleted.");
     }

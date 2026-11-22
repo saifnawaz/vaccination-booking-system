@@ -75,6 +75,10 @@
     --color-danger-500: #d9443a;
     --color-danger-600: #c0352c;
     --color-danger-700: #a12a22;
+
+    /* Charts: one hue for single-series magnitude; the stronger step marks hover/focus. */
+    --color-chart: var(--color-primary-500);
+    --color-chart-strong: var(--color-primary-700);
 }
 
 @layer base {

@@ -33,6 +33,9 @@ return [
     'booking' => [
         // Parents can cancel or reschedule until this many hours before the slot starts.
         'change_cutoff_hours' => 24,
+
+        // Slots starting sooner than this are not offered and can't be booked online.
+        'min_notice_minutes' => 120,
     ],
 
     'slots' => [

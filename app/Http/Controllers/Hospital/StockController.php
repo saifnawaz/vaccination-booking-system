@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StockBatchRequest;
 use App\Models\HospitalStock;
 use App\Models\Vaccine;
+use App\Services\ActivityLogger;
 use App\Services\StockSummary;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -91,8 +92,14 @@ class StockController extends Controller
             'quantity.min' => "{$batch->reserved} doses of this batch are reserved for bookings, so the quantity can't be lower than that.",
         ]);
 
+        $before = $batch->quantity;
         $batch->quantity = $validated['quantity'];
         $batch->save();
+
+        if ($before !== $batch->quantity) {
+            app(ActivityLogger::class)->log('stock.adjusted', "Adjusted batch {$batch->batch_number} ({$batch->vaccine->name}) from {$before} to {$batch->quantity} doses at {$batch->hospital->name}",
+                $batch, ['from' => $before, 'to' => $batch->quantity]);
+        }
 
         return redirect()->route('hospital.stock.index')
             ->with('success', "Batch {$batch->batch_number} now has {$batch->quantity} doses.");
@@ -107,6 +114,7 @@ class StockController extends Controller
         }
 
         $batch->delete();
+        app(ActivityLogger::class)->log('stock.removed', "Removed batch {$batch->batch_number} ({$batch->vaccine->name}, {$batch->quantity} doses) at {$batch->hospital->name}", $batch);
 
         return redirect()->route('hospital.stock.index')->with('success', "Batch {$batch->batch_number} has been removed.");
     }

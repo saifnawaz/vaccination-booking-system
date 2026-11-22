@@ -20,6 +20,7 @@ class Navigation
                 self::item('Overview', 'admin.dashboard', 'admin.dashboard', 'heroicon-o-home'),
                 self::item('Hospitals', 'admin.hospitals.index', 'admin.hospitals.*', 'heroicon-o-building-office-2'),
                 self::item('Vaccines', 'admin.vaccines.index', 'admin.vaccines.*', 'heroicon-o-beaker'),
+                self::item('Activity', 'admin.activity.index', 'admin.activity.*', 'heroicon-o-clipboard-document-check'),
                 self::item('Administrators', 'admin.admins.index', 'admin.admins.*', 'heroicon-o-shield-check'),
             ],
             Role::Hospital => [

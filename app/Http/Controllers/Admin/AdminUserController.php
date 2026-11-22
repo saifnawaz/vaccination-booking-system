@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -60,6 +61,8 @@ class AdminUserController extends Controller
         $admin->role = Role::Admin;
         $admin->email_verified_at = now();
         $admin->save();
+
+        app(ActivityLogger::class)->log('admin.created', "Created administrator account for {$admin->name} ({$admin->email})", $admin);
 
         return redirect()->route('admin.admins.index')
             ->with('success', "Administrator account created for {$admin->name}.");

@@ -80,11 +80,19 @@ class TimeSlot extends Model
      */
     public function scopeNotStarted(Builder $query): void
     {
-        $now = CarbonImmutable::now();
+        $this->scopeStartsAfter($query, CarbonImmutable::now());
+    }
 
+    /**
+     * Slots starting after $moment (e.g. now + the minimum booking notice).
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeStartsAfter(Builder $query, CarbonImmutable $moment): void
+    {
         $query->where(fn (Builder $q) => $q
-            ->whereDate('date', '>', $now->toDateString())
-            ->orWhere(fn (Builder $q) => $q->whereDate('date', $now->toDateString())->where('start_time', '>', $now->format('H:i:s'))));
+            ->whereDate('date', '>', $moment->toDateString())
+            ->orWhere(fn (Builder $q) => $q->whereDate('date', $moment->toDateString())->where('start_time', '>', $moment->format('H:i:s'))));
     }
 
     /**
