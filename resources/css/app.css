@@ -1,3 +1,93 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+
+/* Blade views outside resources/ that use Tailwind classes. */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+ * Design tokens. Every colour in the UI comes from here, so the palette can be
+ * changed in one place. Use the semantic names (primary, accent, success, …)
+ * in views, never raw Tailwind palette colours like teal-700 or red-500.
+ *
+ * Contrast was measured (WCAG 2.1 formula) for every text pairing the views use:
+ *   text, 4.5:1 minimum: white on primary-600/700/800 (5.8–10.1), white on accent-700 (6.0),
+ *     white on danger-600 (5.6), ink / ink-muted / ink-subtle on canvas, surface and
+ *     surface-muted (4.7–13.9), success-700 / warning-800 / danger-700 / accent-700 on
+ *     their -50 tints (5.6–6.4) and on surface (6.0–7.3), primary-700 links on canvas (7.3).
+ *   UI boundaries, 3:1 minimum: line-input field borders (3.5–3.8), primary-500 focus ring (3.8).
+ * Avoid: white text on accent-500/600 (below 4.5:1) and line / line-strong as the only
+ * outline of a form control (decorative dividers only).
+ */
+@theme {
+    --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+
+    /* Deep teal: brand, primary actions, links, focus rings. */
+    --color-primary-50: #effaf8;
+    --color-primary-100: #d5f0eb;
+    --color-primary-200: #abe0d7;
+    --color-primary-300: #78c8bc;
+    --color-primary-400: #47aa9e;
+    --color-primary-500: #2b8d82;
+    --color-primary-600: #1f716a;
+    --color-primary-700: #1b5b56;
+    --color-primary-800: #194946;
+    --color-primary-900: #173d3b;
+    --color-primary-950: #082322;
+
+    /* Soft coral: warnings, attention, "this dose is due". */
+    --color-accent-50: #fff4f1;
+    --color-accent-100: #ffe6df;
+    --color-accent-200: #ffcdbf;
+    --color-accent-300: #ffa892;
+    --color-accent-400: #fa7d61;
+    --color-accent-500: #ef5d3d;
+    --color-accent-600: #d84629;
+    --color-accent-700: #b4371f;
+    --color-accent-800: #922f1f;
+    --color-accent-900: #782b1f;
+
+    /* Warm neutrals: page background, cards, borders, text. */
+    --color-canvas: #faf7f2;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f4efe7;
+    --color-line: #e6dfd4;
+    --color-line-strong: #cfc5b6;
+    --color-line-input: #8c8273;
+    --color-ink: #1d2a29;
+    --color-ink-muted: #56625f;
+    --color-ink-subtle: #626c69;
+
+    /* Status: completed / due / overdue (and success / warning / error messages). */
+    --color-success-50: #ebf6ef;
+    --color-success-100: #d3ecdc;
+    --color-success-500: #2f9a5c;
+    --color-success-700: #1f6b3f;
+
+    --color-warning-50: #fdf5e1;
+    --color-warning-100: #faeac2;
+    --color-warning-500: #d99a16;
+    --color-warning-800: #7a5205;
+
+    --color-danger-50: #fdeceb;
+    --color-danger-100: #fad5d2;
+    --color-danger-500: #d9443a;
+    --color-danger-600: #c0352c;
+    --color-danger-700: #a12a22;
+}
+
+@layer base {
+    body {
+        @apply bg-canvas text-ink antialiased;
+    }
+
+    /* Visible keyboard focus everywhere, not only on form fields. */
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-primary-500;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
